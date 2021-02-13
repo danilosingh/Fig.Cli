@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?define UpgradeCode="478f764a-eedc-45a3-b496-038ba3e5c221" ?>
+<?define ProductName="$(fileVersion.ProductName($(var.Fig.Cli.TargetPath)))" ?>
+<?define CompanyName="$(fileVersion.CompanyName($(var.Fig.Cli.TargetPath)))" ?>
+<?define ProductVersion="$(fileVersion.ProductVersion($(var.Fig.Cli.TargetPath)))" ?>
+
+<Wix xmlns="http://schemas.microsoft.com/wix/2006/wi"
+     xmlns:util="http://schemas.microsoft.com/wix/UtilExtension"
+     xmlns:netfx="http://schemas.microsoft.com/wix/NetFxExtension">
+
+  <Product Id="*" Name="$(var.ProductName)" Language="1046" Version="$(var.ProductVersion)" Manufacturer="$(var.CompanyName)" UpgradeCode="$(var.UpgradeCode)">
+
+    <Package InstallerVersion="200" Compressed="yes" InstallScope="perMachine" InstallPrivileges="elevated"/>
+    <MajorUpgrade DowngradeErrorMessage="Uma versao mais recente do $(var.ProductName) ja esta instalado." AllowSameVersionUpgrades="yes" />
+    <MediaTemplate EmbedCab="yes" CompressionLevel="high" />
+
+    <Condition Message="Esta aplicacao requer .NET Framework 4.7 completo. Por favor, instale o .NET Framework, em seguida, execute o instalador novamente.">
+      <![CDATA[Installed OR NETFRAMEWORK45]]>
+    </Condition>
+
+    <Feature Id="ProductFeature" Title="Fig Features" Level="1">
+      <ComponentRef Id="REGISTRYENTRYINSTALLDIR" />
+      <ComponentGroupRef Id="PRODUCTCOMPONENTS" />
+    </Feature>
+
+    <PropertyRef Id="NETFRAMEWORK45"/>
+    <PropertyRef Id="NETFRAMEWORK40CLIENT"/>
+    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLDIR"/>
+    
+    <Property Id="INSTALLDIR" Secure="yes">
+      <RegistrySearch Id="RegSearch_INSTALLDIR" Root="HKLM" Key="SOFTWARE\$(var.CompanyName)\$(var.ProductName)" Name="INSTALLDIR" Type="raw" />
+    </Property>
+
+    <Component Id="REGISTRYENTRYINSTALLDIR" Directory="INSTALLDIR" Guid="bc7a9499-10a9-4061-8559-f88e2068d153">
+      <RegistryKey Id="PRODUCTREGISTRYROOT" ForceCreateOnInstall="yes" Key="SOFTWARE\$(var.CompanyName)\$(var.ProductName)" Root="HKLM">
+        <RegistryValue Id="INSTALLDIR" Type="string" Name="INSTALLDIR" Value="[INSTALLDIR]" />
+      </RegistryKey>
+    </Component>
+    
+  </Product>
+
+  <Fragment>
+    <Directory Id="TARGETDIR" Name="SourceDir">
+      <Directory Id="ProgramFilesFolder">
+        <Directory Id="MANUFACTURERDIR" Name="$(var.CompanyName)">
+          <Directory Id="INSTALLDIR" Name="$(var.ProductName)" />          
+          <Component Id="INSTALLDIR.PERMISSION" Guid="69c50b89-1f79-432f-bc36-eb6d38e0b230">
+            <Environment Id="PATH" Name="PATH" Value="[INSTALLDIR]" Permanent="yes" Part="last" Action="set" System="yes" />
+            <CreateFolder>
+              <Permission User="Everyone" ChangePermission="yes" GenericAll="yes" WriteExtendedAttributes="yes" WriteAttributes="yes" CreateFile="yes" CreateChild="yes" GenericWrite="no" GenericRead="yes" GenericExecute="yes"/>
+            </CreateFolder>            
+          </Component>
+        </Directory>
+      </Directory>
+    </Directory>
+  </Fragment>
+
+  <Fragment>    
+    <ComponentGroup Id="PRODUCTCOMPONENTS" Directory="INSTALLDIR">
+      <ComponentRef Id="INSTALLDIR.PERMISSION" />
+      <ComponentGroupRef Id="Fig.Cli" />
+    </ComponentGroup>
+  </Fragment>
+</Wix>

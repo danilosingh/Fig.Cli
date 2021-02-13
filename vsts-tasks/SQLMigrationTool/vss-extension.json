@@ -1,0 +1,53 @@
+{
+    "manifestVersion": 1,
+    "id": "SQLMigrationTool",
+    "name": "Unicus SQL Migration Tool",
+    "version": "0.1.7",
+    "publisher": "Unicus",    
+    "targets": [
+        {
+            "id": "Microsoft.VisualStudio.Services"
+        }
+    ],
+    "description": "Runs SQL Server change scripts, and only those which have not been run already.",
+    "categories": [
+        "Build and release"
+    ],
+    "tags": [
+        "database",
+        "migration",
+        "sql",
+        "migrate",
+        "change",
+        "script"
+    ],
+    "content": {
+        "details": {
+            "path": "README.md"
+        }
+    },    
+    "branding": {
+        "color": "rgb(36, 43, 50)",
+        "theme": "dark"
+    },
+    "icons": {
+        "default": "extension-icon.png"
+    },
+    "files": [
+        {
+            "path": "task"
+        }
+    ],
+    "contributions": [
+        {
+            "id": "SQLMigrationTool",
+            "type": "ms.vss-distributed-task.task",
+            "targets": [
+                "ms.vss-distributed-task.tasks"
+            ],
+            "properties": {
+                "name": "task"
+            }
+        }
+    ]
+}

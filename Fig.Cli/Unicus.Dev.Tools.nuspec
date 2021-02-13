@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>Fig.Cli</id>
+    <version>$version$</version>
+    <title>Unicus Developer Tools</title>
+    <authors>Danilo Singh</authors>
+    <owners>Unicus</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>Unicus Developer Tools</description>
+    <releaseNotes>Summary of changes made in this release of the package.</releaseNotes>
+    <copyright>Copyright 2018</copyright>
+    <tags>Tools</tags>
+  </metadata>
+    <files>
+       <file src="bin\$configuration$\dev.exe" target="lib\net452" />
+       <file src="bin\$configuration$\dev.exe.config" target="lib\net452" />
+       <file src="bin\$configuration$\dev.pdb" target="lib\net452" />
+    </files>
+</package>

@@ -1,0 +1,75 @@
+{
+    "id": "c4800d47-ec43-4f00-914f-9e2005cd3e84",
+    "name": "SQLMigrationTool",
+    "friendlyName": "Unicus SQL Migration Tool",
+    "description": "Tool for SQL Migration",
+    "helpMarkDown": "",
+    "category": "Utility",
+    "visibility": [
+        "Build",
+        "Release"
+    ],
+    "author": "Unicus",
+    "version": {
+        "Major": 0,
+        "Minor": 1,
+        "Patch": 7
+    },
+    "instanceNameFormat": "Unicus SQL Migration Tool",
+    "groups": [
+        {
+            "name": "advanced",
+            "displayName": "Advanced",
+            "isExpanded": false
+        }
+    ],
+    "inputs": [
+        {
+            "name": "ScriptPath",
+            "type": "filePath",
+            "label": "Scripts path",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "Script path"
+        },
+        {
+            "name": "Server",
+            "type": "string",
+            "label": "Server",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "SQL Server Instance"
+        },
+        {
+            "name": "Database",
+            "type": "string",
+            "label": "Database",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "Database name"
+        },
+        {
+            "name": "User",
+            "type": "string",
+            "label": "User",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "User"
+        },
+        {
+            "name": "Password",
+            "type": "string",
+            "label": "Password",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "Password"
+        }
+    ],
+    "execution": {
+        "PowerShell": {
+            "target": "$(currentDirectory)\\scripts\\Update-Database.ps1",
+            "argumentFormat": "",
+            "workingDirectory": "$(currentDirectory)"
+        }
+    }    
+}
