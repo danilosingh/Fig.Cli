@@ -252,7 +252,7 @@
     <Compile Include="Options\DoneWorkItemOptions.cs" />
     <Compile Include="Options\SyncOptions.cs" />
     <Compile Include="AzureDevOps\Helpers\AzureGitHelper.cs" />
-    <Compile Include="AzureDevOps\Helpers\TfsWorkItemHelpers.cs" />
+    <Compile Include="AzureDevOps\Helpers\AzureWorkItemHelpers.cs" />
     <Compile Include="AzureDevOps\AzureDevOpsClientContext.cs" />
     <Compile Include="AzureDevOps\Helpers\AzureProjectHelper.cs" />
     <Compile Include="Command.cs" />

@@ -74,9 +74,9 @@ namespace Fig.Cli.Commands
             foreach (var item in workItems)
             {
                 if (!item.Fields.ContainsKey("Microsoft.VSTS.Common.Activity"))
-                    TfsWorkItemHelpers.ChangeField(workItemTrackingClient, (int)item.Id, "Microsoft.VSTS.Common.Activity", "Development");
+                    AzureWorkItemHelpers.ChangeField(workItemTrackingClient, (int)item.Id, "Microsoft.VSTS.Common.Activity", "Development");
 
-                TfsWorkItemHelpers.ChangeState(workItemTrackingClient, (int)item.Id, "Done");
+                AzureWorkItemHelpers.ChangeState(workItemTrackingClient, (int)item.Id, "Done");
             }
 
             return Ok();

@@ -4,7 +4,7 @@ using Microsoft.VisualStudio.Services.WebApi.Patch.Json;
 
 namespace Fig.Cli.TeamFoundation.Helpers
 {
-    public static class TfsWorkItemHelpers
+    public static class AzureWorkItemHelpers
     {
         public static void ChangeState(WorkItemTrackingHttpClient client, int id, string state)
         {
