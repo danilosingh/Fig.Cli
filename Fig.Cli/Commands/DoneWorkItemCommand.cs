@@ -96,9 +96,9 @@ namespace Fig.Cli.Commands
         {
             var project = AzureProjectHelper.FindDefaultProject(AzureContext);
 
-            var query = $"SELECT [System.Id], [System.Title] FROM WorkItems " +
+            var query = $"SELECT [System.Id], [System.AssignedTo], [System.Title] FROM WorkItems " +
                 $"WHERE [System.TeamProject] = '{project.Name}' " +
-                $"AND [System.AssignedTo] = '{ConvertUserName()}' " +
+                $"AND [System.AssignedTo] = '{Context.Options.UserName}' " +
                 $"AND [System.State] = 'In Progress' ";
 
             if (Options.WorkItemId > 0)
