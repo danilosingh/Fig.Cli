@@ -47,7 +47,7 @@ namespace Fig.Cli.Commands
         private CommandResult OpenPullRequest(IList<WorkItem> workItems)
         {
             var parentWorkItens = workItems.Select(c => workItemTrackingClient.GetWorkItemAsync(c.GetParentId(), expand: WorkItemExpand.All).Result).ToList();
-            var release = parentWorkItens.Select(c => c.GetField<string>("Unicus.Release")).FirstOrDefault();
+            var release = parentWorkItens.Select(c => c.GetField<string>("Release")).FirstOrDefault();
 
             if (!string.IsNullOrEmpty(release) && HasReleaseBranch(release))
                 release = "release/" + release;

@@ -112,7 +112,7 @@ namespace Fig.Cli.Commands
 
         private string GetReleaseVersionFromWorkItems(List<WorkItem> relatedWorkitems)
         {
-            var versions = relatedWorkitems.Select(c => c.GetField<string>("Unicus.Release")).Where(c => !string.IsNullOrEmpty(c)).Distinct().ToList();
+            var versions = relatedWorkitems.Select(c => c.GetField<string>("Custom.Release")).Where(c => !string.IsNullOrEmpty(c)).Distinct().ToList();
 
             if (versions.Count > 1)
                 throw new ArgumentException("Related workd items with different releases");

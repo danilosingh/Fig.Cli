@@ -1,7 +1,7 @@
-﻿using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
+﻿using Fig.Cli.Helpers;
+using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
 using System;
 using System.Linq;
-using Fig.Cli.Helpers;
 
 namespace Fig.Cli
 {
@@ -10,7 +10,7 @@ namespace Fig.Cli
         public static T GetField<T>(this WorkItem workItem, string fieldName)
         {
             if (!workItem.Fields.ContainsKey(fieldName))
-                return default(T);
+                return default;
 
             return TypeHelper.Convert<T>(workItem.Fields[fieldName]);
         }
