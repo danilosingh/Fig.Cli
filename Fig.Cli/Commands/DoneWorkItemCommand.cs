@@ -1,4 +1,5 @@
-﻿using Fig.Cli.Options;
+﻿using Fig.Cli.Extensions;
+using Fig.Cli.Options;
 using Fig.Cli.TeamFoundation.Helpers;
 using Microsoft.TeamFoundation.SourceControl.WebApi;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi;

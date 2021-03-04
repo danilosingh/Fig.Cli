@@ -38,11 +38,6 @@ namespace Fig.Cli
             return new AzureDevOpsClientContext(new Uri(uri), CreateCredentials());
         }
 
-        protected bool IsInitialized()
-        {
-            return Context.IsInitialized();
-        }
-
         private void AddProperty<TValue>(string name, TValue value)
         {
             if (!EqualityComparer<TValue>.Default.Equals(value, default))
@@ -51,14 +46,7 @@ namespace Fig.Cli
             }
         }
 
-        protected virtual void EnsureConfiguration()
-        {
-            if (!IsInitialized())
-            {
-                throw new ArgumentException("Fig.Cli not configured. Use the option 'config'.");
-            }
-        }
-
+        
         protected string ConvertUserName()
         {
             if (!Context.Options.UserName.Contains("@"))

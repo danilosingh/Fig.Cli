@@ -95,6 +95,19 @@ namespace Fig.Cli
         {
             Console.Write(message, args);
         }
+
+        protected bool IsInitialized()
+        {
+            return Context.IsInitialized();
+        }
+
+        protected virtual void EnsureConfiguration()
+        {
+            if (!IsInitialized())
+            {
+                throw new ArgumentException("Fig.Cli not configured. Use the option 'config'.");
+            }
+        }
     }
 
     public abstract class Command<T> : Command

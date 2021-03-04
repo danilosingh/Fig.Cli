@@ -1,6 +1,8 @@
-﻿using System;
+﻿using Fig.Cli.Extensions;
+using System;
 using System.ComponentModel;
 using System.Globalization;
+using System.Reflection;
 
 namespace Fig.Cli.Helpers
 {
@@ -12,7 +14,7 @@ namespace Fig.Cli.Helpers
 
             if (value == null || value is DBNull)
             {
-                return default(T);
+                return default;
             }
 
             if (cultureInfo == null)
@@ -20,11 +22,11 @@ namespace Fig.Cli.Helpers
                 cultureInfo = CultureInfo.CurrentCulture;
             }
 
-            if (value is string)
+            if (value is string @string)
             {
                 if (toType == typeof(string[]))
                 {
-                    return value == null ? default(T) : (T)(object)((string)value).Split("|");
+                    return value == null ? default(T) : (T)(object)@string.Split("|");
                 }
                 if (toType == typeof(Guid?))
                 {
@@ -34,7 +36,7 @@ namespace Fig.Cli.Helpers
                 {
                     return Convert<T>(new Guid(System.Convert.ToString(value, cultureInfo)), cultureInfo);
                 }
-                if ((string)value == string.Empty && toType != typeof(string))
+                if (@string == string.Empty && toType != typeof(string))
                 {
                     return Convert<T>(null, cultureInfo);
                 }
@@ -70,6 +72,11 @@ namespace Fig.Cli.Helpers
                 return (T)System.Convert.ChangeType(value, toType, cultureInfo);
             }
             return (T)value;
+        }
+
+        public static PropertyInfo GetProperty(Type type, string propertyName)
+        {
+            return type.GetProperty(propertyName, BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using Fig.Cli.Helpers;
 using Fig.Cli.Options;
-using Fig.Cli.Versioning;
 using Npgsql;
 using System;
 using System.Collections.Generic;
@@ -12,9 +11,10 @@ using System.Text;
 
 namespace Fig.Cli.Commands
 {
-    public class RunScriptsCommand : Command<RunScriptsOptions>
+    public class RunScriptsCommand<T> : Command<T>
+        where T : RunScriptsOptions
     {
-        public RunScriptsCommand(RunScriptsOptions opts, FigContext context) : base(opts, context)
+        public RunScriptsCommand(T opts, FigContext context) : base(opts, context)
         { }
 
         public override CommandResult Execute()
@@ -24,15 +24,19 @@ namespace Fig.Cli.Commands
             return RunScripts();
         }
 
-        private CommandResult RunScripts()
+        protected CommandResult RunScripts()
         {
             if (!Options.SupressConfirmation && !ConfirmRun())
+            {
                 return Canceled();
+            }
 
             var scripts = GetScripts();
 
             if (scripts.Count == 0)
+            {
                 return Ok("No scripts.");
+            }
 
             RunScripts(scripts);
             return Ok();
@@ -72,16 +76,23 @@ namespace Fig.Cli.Commands
             }
         }
 
-        private void ExecScript(string scriptPath, IDbTransaction transaction, int count, int currentIndex)
+        protected virtual void ExecScript(string scriptPath, IDbTransaction transaction, int count, int currentIndex)
         {
             var allText = File.ReadAllText(scriptPath, Encoding.UTF8);
             var commandsText = allText.Split(new string[] { "GO;", "go;" }, StringSplitOptions.RemoveEmptyEntries);
 
             Console.WriteLine($"Running script {Path.GetFileName(scriptPath)} ({currentIndex}/{count}) {GetAuthorName(allText)}");
-
-            foreach (var commandText in commandsText)
+            try
             {
-                ExecCommandText(commandText, transaction);
+                foreach (var commandText in commandsText)
+                {
+                    ExecCommandText(commandText, transaction);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error on script: {scriptPath} / Message: {ex.Message}");
+                throw ex;
             }
         }
 
@@ -93,7 +104,7 @@ namespace Fig.Cli.Commands
                 return null;
 
             i += 6;
-            return "(" + allText.Substring(i, allText.IndexOf("\r\n", i) - i)?.Trim() + ")";
+            return "(" + allText[i..allText.IndexOf("\r\n", i)]?.Trim() + ")";
         }
 
         private void ExecCommandText(string commandText, IDbTransaction transaction)
@@ -106,17 +117,17 @@ namespace Fig.Cli.Commands
             }
         }
 
-        private IDbConnection CreateConnection()
+        protected IDbConnection CreateConnection()
         {
             IDbConnection connection = Options.Provider == DbProviders.SqlServer ?
-                CreateSqlServerConnection() : 
+                CreateSqlServerConnection() :
                 CreatePostgreSqlConnection();
 
             connection.Open();
             return connection;
         }
 
-        private IDbConnection CreatePostgreSqlConnection()
+        protected IDbConnection CreatePostgreSqlConnection()
         {
             var connectionStringBuilder = new NpgsqlConnectionStringBuilder
             {
@@ -129,7 +140,7 @@ namespace Fig.Cli.Commands
             return new NpgsqlConnection(connectionStringBuilder.ToString());
         }
 
-        private IDbConnection CreateSqlServerConnection()
+        protected IDbConnection CreateSqlServerConnection()
         {
             var connectionStringBuilder = new SqlConnectionStringBuilder
             {
@@ -142,7 +153,7 @@ namespace Fig.Cli.Commands
             return new SqlConnection(connectionStringBuilder.ToString());
         }
 
-        private IList<string> GetScripts()
+        protected IList<string> GetScripts()
         {
             if (Options.IgnoreDirectoryExists && !Directory.Exists(Options.ScriptsDirectory))
                 return new List<string>();
@@ -155,18 +166,18 @@ namespace Fig.Cli.Commands
             return files.OrderBy(c => c).ToList();
         }
 
-        private void PrepareOptions()
+        protected virtual void PrepareOptions()
         {
             Options.ScriptsDirectory = Options.ScriptsDirectory ?? StringHelper.ConcatPath(Context.RootDirectory, Context.Options.DbScriptPath);
             Options.Server = Options.Server ?? Context.Options.DbServer;
             Options.Database = Options.Database ?? Context.Options.DbName;
             Options.UserName = Options.UserName ?? Context.Options.DbUserName;
             Options.Password = Options.Password ?? Context.Options.DbPassword;
-            Options.GreaterThan = Options.GreaterThan ?? VersionInfo.LoadVersion()?.LastScript;
+            Options.GreaterThan = Options.GreaterThan;
             Options.Provider = Options.Provider ?? Context.Options.DbProvider;
         }
 
-        private void EnsureValidOptions()
+        protected void EnsureValidOptions()
         {
             if (string.IsNullOrEmpty(Options.ScriptsDirectory))
                 throw new ArgumentException("Scripts directory not configured.");
@@ -187,6 +198,13 @@ namespace Fig.Cli.Commands
 
             if (string.IsNullOrEmpty(Options.Password))
                 throw new ArgumentException("Password not configured.");
+        }
+    }
+
+    public class RunScriptsCommand : RunScriptsCommand<RunScriptsOptions>
+    {
+        public RunScriptsCommand(RunScriptsOptions opts, FigContext context) : base(opts, context)
+        {
         }
     }
 }

@@ -3,9 +3,9 @@ using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
 using System;
 using System.Linq;
 
-namespace Fig.Cli
+namespace Fig.Cli.Extensions
 {
-    public static class Extensions
+    public static class WorkItemExtensions
     {
         public static T GetField<T>(this WorkItem workItem, string fieldName)
         {
@@ -23,23 +23,6 @@ namespace Fig.Cli
                 return 0;
 
             return Convert.ToInt32(parentRelation.Url.Substring(parentRelation.Url.LastIndexOf('/') + 1));
-        }
-
-        public static string[] Split(this string str, string separator, StringSplitOptions options = StringSplitOptions.RemoveEmptyEntries, int count = 0)
-        {
-            return count > 0 ?
-                str.Split(new string[] { separator }, count, options) :
-                str.Split(new string[] { separator }, options);
-        }
-
-        public static string Replace(this string str, string[] strings, string newString)
-        {
-            foreach (var item in strings)
-            {
-                str = str.Replace(item, newString);
-            }
-
-            return str;
         }
     }
 }

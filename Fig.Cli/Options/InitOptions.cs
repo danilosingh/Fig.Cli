@@ -44,5 +44,7 @@ namespace Fig.Cli.Options
         [Option("dbprovider", HelpText = "Database provider", Default = DbProviders.PostgreSql)]
         public string DbProvider { get; set; }
 
+        [Option("migrations-table", HelpText = "Migrations Table Name", Default = "migrations")]
+        public string DbMigrationsTable { get; set; }
     }
 }

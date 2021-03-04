@@ -1,6 +1,5 @@
 ﻿using CommandLine;
 using Fig.Cli.Commands;
-using Fig.Cli.Helpers;
 using Fig.Cli.Options;
 using System;
 using System.Diagnostics;
@@ -27,10 +26,12 @@ namespace Fig.Cli
                         PullRequestOptions,
                         MergePullRequestOptions,
                         ScriptOptions,
+                        MigrateDbOptions,
                         RunScriptsOptions,
                         ClearBranchesOptions,
                         FindInBranchesOptions,
-                        GuidOptions>(args)
+                        SetOptions,
+                        GuidOptions >(args)
                     .MapResult(
                         (InitOptions opts) => CommandFactory.Execute<InitCommand>(opts),
                         (StartWorkItemOptions opts) => CommandFactory.Execute<StartWorkItemCommand>(opts),
@@ -42,9 +43,11 @@ namespace Fig.Cli
                         (PullRequestOptions opts) => CommandFactory.Execute<PullRequestCommand>(opts),
                         (MergePullRequestOptions opts) => CommandFactory.Execute<MergePullRequestCommand>(opts),
                         (ScriptOptions opts) => CommandFactory.Execute<ScriptCommand>(opts),
+                        (MigrateDbOptions opts) => CommandFactory.Execute<MigrateDbCommand>(opts),
                         (RunScriptsOptions opts) => CommandFactory.Execute<RunScriptsCommand>(opts),
                         (ClearBranchesOptions opts) => CommandFactory.Execute<ClearBranchesCommand>(opts),
                         (FindInBranchesOptions opts) => CommandFactory.Execute<FindInBranchesCommand>(opts),
+                        (SetOptions opts) => CommandFactory.Execute<SetOptionCommand>(opts),
                         (GuidOptions opts) => CommandFactory.Execute<GuidCommand>(opts),
                         (errs) => new CommandResult(false));
 

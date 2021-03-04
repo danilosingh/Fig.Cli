@@ -17,5 +17,6 @@
         public string DbServer { get; set; }
         public string DbName { get; set; }
         public string DbProvider { get; set; }
+        public string DbMigrationsTable { get; set; }
     }
 }

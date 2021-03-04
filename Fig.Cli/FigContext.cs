@@ -20,6 +20,19 @@ namespace Fig.Cli
         {
             get { return rootDirectory; }
         }
+
+        public void SetOption(string name, string value)
+        {
+            var property = TypeHelper.GetProperty(typeof(FigOptions), name);
+
+            if (property == null)
+            {
+                throw new ArgumentException($"Property {name} is invalid");
+            }
+
+            property.SetValue(Options, value);
+        }
+
         public string ConfFilePath
         {
             get { return Path.Combine(FigDirectory, ".conf"); }

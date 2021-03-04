@@ -9,8 +9,7 @@ namespace Fig.Cli.Commands
     public class ClearBranchesCommand : AzureDevOpsCommand<ClearBranchesOptions>
     {
         public ClearBranchesCommand(ClearBranchesOptions opts, FigContext context) : base(opts, context)
-        {
-        }
+        { }
 
         public override CommandResult Execute()
         {

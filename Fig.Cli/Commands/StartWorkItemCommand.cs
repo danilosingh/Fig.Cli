@@ -1,6 +1,6 @@
-﻿using Fig.Cli.Helpers;
+﻿using Fig.Cli.Extensions;
+using Fig.Cli.Helpers;
 using Fig.Cli.Options;
-using Fig.Cli.Versioning;
 using Microsoft.TeamFoundation.Core.WebApi;
 using Microsoft.TeamFoundation.SourceControl.WebApi;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
@@ -9,7 +9,6 @@ using Microsoft.VisualStudio.Services.WebApi.Patch;
 using Microsoft.VisualStudio.Services.WebApi.Patch.Json;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 
 namespace Fig.Cli.Commands
@@ -70,34 +69,20 @@ namespace Fig.Cli.Commands
 
             if (Options.RunDbScripts)
             {
-                result = RunDataBaseScripts();
+                result = MigrateDatabase();
             }
 
             return result;
         }
 
-        private CommandResult RunDataBaseScripts()
+        private CommandResult MigrateDatabase()
         {
-            var version = VersionInfo.LoadVersion();
-
-            if (version == null)
-            {
-                return CommandResult.Ok();
-            }
-
-            var scriptsOpts = new RunScriptsOptions()
-            {
-                GreaterThan = version.LastScript,
-                Server = Context.Options.DbServer,
-                UserName = Context.Options.DbUserName,
-                Password = Context.Options.DbPassword,
-                Database = Context.Options.DbName,
-                ScriptsDirectory = Path.Combine(Context.RootDirectory, Context.Options.DbScriptPath),
-                SupressConfirmation = true,
-                Provider = Context.Options.DbProvider,
+            var opts = new MigrateDbOptions()
+            {                
+                SupressConfirmation = true                
             };
 
-            return CommandFactory.Execute<RunScriptsCommand>(scriptsOpts);
+            return CommandFactory.Execute<MigrateDbCommand>(opts);
         }
 
         private GitRef GetReleaseBranch(Guid repoId, string releaseBranchName)

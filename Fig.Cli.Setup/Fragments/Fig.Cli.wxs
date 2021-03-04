@@ -3,10 +3,10 @@
     <Fragment>
         <DirectoryRef Id="INSTALLDIR">
             <Component Id="cmp842F61D27D3A67D7794972B885968086" Guid="*">
-                <File Id="filC860A0A2FC73458621DDDF7665C71B3E" KeyPath="yes" Source="$(var.Fig.Cli.TargetDir)\fig.exe" />
+                <File Id="filC860A0A2FC73458621DDDF7665C71B3E" KeyPath="yes" Source="$(var.Fig.Cli.TargetDir)win-x64\publish\fig.exe" />
             </Component>
             <Component Id="cmp8A91534C54CB4D404BC99C4410AF1C03" Guid="*">
-                <File Id="fil035A07414865A0875E1EFDEB91CF1B7D" KeyPath="yes" Source="$(var.Fig.Cli.TargetDir)\fig.exe.config" />
+                <File Id="fil035A07414865A0875E1EFDEB91CF1B7D" KeyPath="yes" Source="$(var.Fig.Cli.TargetDir)win-x64\publish\fig.pdb" />
             </Component>
         </DirectoryRef>
     </Fragment>

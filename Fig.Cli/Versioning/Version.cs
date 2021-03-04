@@ -1,4 +1,5 @@
-﻿using Fig.Cli.Helpers;
+﻿using Fig.Cli.Extensions;
+using Fig.Cli.Helpers;
 using System;
 using System.IO;
 using System.Web.Script.Serialization;
