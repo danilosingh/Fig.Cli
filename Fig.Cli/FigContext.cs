@@ -52,7 +52,7 @@ namespace Fig.Cli
 
             if (string.IsNullOrEmpty(rootDirectory))
             {
-                throw new InvalidOperationException("not a git repository.");
+                rootDirectory = Directory.GetCurrentDirectory();
             }
 
             figDirectory = Path.Combine(rootDirectory, ".fig");
