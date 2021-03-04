@@ -1,8 +1,7 @@
-﻿using Fig.Cli.Extensions;
-using Fig.Cli.Helpers;
+﻿using Fig.Cli.Helpers;
+using Newtonsoft.Json;
 using System;
 using System.IO;
-using System.Web.Script.Serialization;
 
 namespace Fig.Cli.Versioning
 {
@@ -47,7 +46,7 @@ namespace Fig.Cli.Versioning
             if (!File.Exists(versionFileName))
                 return null;
 
-            return new JavaScriptSerializer().Deserialize<VersionInfo>(File.ReadAllText(versionFileName));
+            return JsonConvert.DeserializeObject<VersionInfo>(File.ReadAllText(versionFileName));
         }
     }
 }
