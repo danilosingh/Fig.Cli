@@ -2,7 +2,9 @@
 using Fig.Cli.Commands;
 using Fig.Cli.Options;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.Linq;
 
 namespace Fig.Cli
 {
@@ -31,7 +33,7 @@ namespace Fig.Cli
                         ClearBranchesOptions,
                         FindInBranchesOptions,
                         SetOptions,
-                        GuidOptions >(args)
+                        GuidOptions>(args)
                     .MapResult(
                         (InitOptions opts) => CommandFactory.Execute<InitCommand>(opts),
                         (StartWorkItemOptions opts) => CommandFactory.Execute<StartWorkItemCommand>(opts),
@@ -68,7 +70,8 @@ namespace Fig.Cli
             }
             catch (Exception ex)
             {
-                ConsoleWrite("Error: {0}", ex.InnerException?.Message ?? ex.Message);
+
+                ConsoleWrite($"Error: {GetFormattedException(ex)}");
                 exitCode = 1;
             }
             finally
@@ -78,6 +81,21 @@ namespace Fig.Cli
 
                 Environment.Exit(exitCode);
             }
+        }
+
+        private static string GetFormattedException(Exception ex)
+        {
+            var exceptions = new List<Exception>() { ex };
+
+            while (ex.InnerException != null)
+            {
+                exceptions.Add(ex);
+                ex = ex.InnerException;
+            }
+            
+            return string.Join(Environment.NewLine, exceptions.AsEnumerable()
+                .Reverse()
+                .Select(c => $"{c.Message} on {c.StackTrace}"));
         }
 
         private static void ConsoleWrite(string format, params object[] args)

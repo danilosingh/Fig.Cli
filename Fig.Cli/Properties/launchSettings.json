@@ -2,8 +2,7 @@
   "profiles": {
     "Fig.Cli": {
       "commandName": "Project",
-      "commandLineArgs": "migratedb --server localhost --user spedy-stage --password bYFjZahtl@ETK!Gg --db spedy-stage --directory src\\api\\Scripts --supressconfirm true --provider PostgreSql",
-      "workingDirectory": "D:\\Danilo\\Source\\Spedy"
+      "commandLineArgs": "migratedb --server 162.214.168.65 --user spedy-stage --password bYFjZahtl@ETK!Gg --db spedy-stage --directory D:\\Danilo\\Source\\Spedy\\src\\api\\scripts --supressconfirm true --provider PostgreSql"
     }
   }
 }
