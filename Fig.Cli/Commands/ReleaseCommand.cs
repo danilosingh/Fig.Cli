@@ -2,11 +2,11 @@
 using Fig.Cli.Options;
 using Fig.Cli.Versioning;
 using Microsoft.TeamFoundation.SourceControl.WebApi;
+using Newtonsoft.Json;
 using System;
 using System.IO;
 using System.Linq;
 using System.Text;
-using System.Web.Script.Serialization;
 
 namespace Fig.Cli.Commands
 {
@@ -105,8 +105,8 @@ namespace Fig.Cli.Commands
         }
 
         private void SaveFileVersion(VersionInfo versionInfo)
-        {
-            var json = new JavaScriptSerializer().Serialize(versionInfo);
+        {            
+            var json = JsonConvert.SerializeObject(versionInfo);
             File.WriteAllText(Context.FigDirectory + @"\.version", json, Encoding.UTF8);
         }
     }
