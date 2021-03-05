@@ -71,7 +71,7 @@ namespace Fig.Cli.Commands
                 catch (Exception ex)
                 {
                     transaction.Rollback();
-                    throw ex;
+                    throw new Exception("Error on RunScripts", ex);
                 }
             }
         }
