@@ -52,38 +52,25 @@ namespace Fig.Cli.Commands
 
         private void RunScripts(IList<string> scripts)
         {
-            Console.WriteLine("Begin RunScripts");
-            using (var conn = CreateConnection())
+            using var conn = CreateConnection();
+            var transaction = conn.BeginTransaction();
+
+            try
             {
-                Console.WriteLine("Connection created");
+                if (!string.IsNullOrEmpty(Options.GreaterThan))
+                    Console.WriteLine("Running greater than {0}", Options.GreaterThan);
 
-                var transaction = conn.BeginTransaction();
-                Console.WriteLine("transaction created");
-
-                try
+                for (int i = 0; i < scripts.Count; i++)
                 {
-                    Console.WriteLine("Try");
-
-                    if (!string.IsNullOrEmpty(Options.GreaterThan))
-                        Console.WriteLine("Running greater than {0}", Options.GreaterThan);
-
-
-                    Console.WriteLine($"Scripts {scripts.Count}");
-
-                    for (int i = 0; i < scripts.Count; i++)
-                    {
-                        Console.WriteLine($"Script {i}");
-
-                        ExecScript(scripts[i], transaction, scripts.Count, i + 1);
-                    }
-
-                    transaction.Commit();
+                    ExecScript(scripts[i], transaction, scripts.Count, i + 1);
                 }
-                catch (Exception ex)
-                {
-                    transaction.Rollback();
-                    throw ex;
-                }
+
+                transaction.Commit();
+            }
+            catch (Exception ex)
+            {
+                transaction.Rollback();
+                throw ex;
             }
         }
 
@@ -109,13 +96,21 @@ namespace Fig.Cli.Commands
 
         private string GetAuthorName(string allText)
         {
-            var i = allText.IndexOf("Autor:");
+            try
+            {
+                var i = allText.IndexOf("Autor:");
 
-            if (i < 0)
-                return null;
+                if (i < 0)
+                    return null;
 
-            i += 6;
-            return "(" + allText[i..allText.IndexOf("\r\n", i)]?.Trim() + ")";
+                i += 6;
+
+                return "(" + allText[i..allText.IndexOf(Environment.NewLine, i)]?.Trim() + ")";
+            }
+            catch
+            {
+                return "(Unknow)";
+            }
         }
 
         private void ExecCommandText(string commandText, IDbTransaction transaction)
