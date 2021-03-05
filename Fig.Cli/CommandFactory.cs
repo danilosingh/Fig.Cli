@@ -11,7 +11,7 @@ namespace Fig.Cli
             var toolPlatform = Environment.OSVersion.Platform == PlatformID.Win32NT ? "windows" : "linux";
             
             Console.ForegroundColor = ConsoleColor.DarkGreen;
-            Console.WriteLine($"Running yuniql v{toolVersion.Major}.{toolVersion.Minor}.{toolVersion.Build} for {toolPlatform}-x64");
+            Console.WriteLine($"Running fig v{toolVersion.Major}.{toolVersion.Minor}.{toolVersion.Build} for {toolPlatform}-x64");
             Console.WriteLine($"Visit https://github.com/danilosingh/Fig.Cli for documentation & more samples{Environment.NewLine}");
             Console.ResetColor();
 
