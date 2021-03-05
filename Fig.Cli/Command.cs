@@ -105,7 +105,7 @@ namespace Fig.Cli
         {
             if (!IsInitialized())
             {
-                throw new ArgumentException("Fig.Cli not configured. Use the option 'config'.");
+                throw new FigException("Fig.Cli not configured. Use the option 'config'.");
             }
         }
     }

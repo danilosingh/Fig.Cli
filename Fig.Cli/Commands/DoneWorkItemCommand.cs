@@ -108,12 +108,12 @@ namespace Fig.Cli.Commands
             var queryResult = workItemTrackingClient.QueryByWiqlAsync(new Wiql() { Query = query }).Result;
 
             if (!queryResult.WorkItems.Any())
-                throw new ArgumentException("No items in progress");
+                throw new FigException("No items in progress");
 
             var workItems = queryResult.WorkItems.Select(c => workItemTrackingClient.GetWorkItemAsync(c.Id, expand: WorkItemExpand.All).Result).ToList();
 
             if (WorkItemsFromDifferentParents(workItems))
-                throw new ArgumentException("The workitems in progress are of different parents");
+                throw new FigException("The workitems in progress are of different parents");
 
             return workItems;
         }

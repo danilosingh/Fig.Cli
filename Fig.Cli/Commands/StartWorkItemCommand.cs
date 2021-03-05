@@ -27,7 +27,7 @@ namespace Fig.Cli.Commands
         public override CommandResult Execute()
         {
             if (Options.WorkItemId <= 0)
-                throw new ArgumentException("Invalid workitem ID.");
+                throw new FigException("Invalid workitem ID.");
 
             var project = AzureProjectHelper.FindDefaultProject(AzureContext);
             var repo = AzureGitHelper.FindRepository(AzureContext, project.Id, Context.Options.RepositoryName);
@@ -40,7 +40,7 @@ namespace Fig.Cli.Commands
             if (!string.IsNullOrEmpty(Options.Release) &&
                 !string.IsNullOrEmpty(workItemsReleaseVersion) &&
                 workItemsReleaseVersion != Options.Release)
-                throw new ArgumentException("The reported release is different from the linked release in the workitems");
+                throw new FigException("The reported release is different from the linked release in the workitems");
 
             var releaseBranchName = workItemsReleaseVersion ?? Options.Release;
             var parentWorkItem = relatedWorkitems.FirstOrDefault();
@@ -100,7 +100,7 @@ namespace Fig.Cli.Commands
             var versions = relatedWorkitems.Select(c => c.GetField<string>("Custom.Release")).Where(c => !string.IsNullOrEmpty(c)).Distinct().ToList();
 
             if (versions.Count > 1)
-                throw new ArgumentException("Related workd items with different releases");
+                throw new FigException("Related workd items with different releases");
 
             return versions.FirstOrDefault();
         }

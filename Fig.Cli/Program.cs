@@ -59,13 +59,11 @@ namespace Fig.Cli
 
                 if (!string.IsNullOrEmpty(result.Message))
                 {
-                    ConsoleWrite("Result");
                     ConsoleWrite(result.Message);
                 }
             }
-            catch (ArgumentException ex)
+            catch (FigException ex)
             {
-                ConsoleWrite(ex.StackTrace);
                 ConsoleWrite(ex.Message);
                 exitCode = 1;
             }
@@ -74,7 +72,6 @@ namespace Fig.Cli
                 ConsoleWrite($"Error: {GetFormattedException(ex)}");
                 exitCode = 1;
             }
-            ConsoleWrite("Chegouu no final");
 
             return exitCode;
         }

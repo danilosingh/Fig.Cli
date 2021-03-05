@@ -1,6 +1,5 @@
 ﻿using Fig.Cli.Helpers;
 using Fig.Cli.Options;
-using System;
 
 namespace Fig.Cli.Commands
 {
@@ -13,12 +12,12 @@ namespace Fig.Cli.Commands
         public override CommandResult Execute()
         {
             if (string.IsNullOrEmpty(Options.SourceBranch))
-                throw new ArgumentException("Source branch is required.");
+                throw new FigException("Source branch is required.");
 
             var targetBranch = Options.TargetBranch ?? GitHelper.GetCurrentBranchName();
 
             if (targetBranch == Options.SourceBranch)
-                throw new ArgumentException("Source branch equal target branch.");
+                throw new FigException("Source branch equal target branch.");
 
             if (!Confirm($"Confirm merge {Options.SourceBranch} to {targetBranch}?"))
                 return Canceled();

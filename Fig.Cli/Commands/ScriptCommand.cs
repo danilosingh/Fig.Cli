@@ -14,7 +14,7 @@ namespace Fig.Cli.Commands
         public override CommandResult Execute()
         {
             if (string.IsNullOrEmpty(Context.Options.DbScriptPath))
-                throw new ArgumentException(@"Script path not configured. Use config --spath database\script");
+                throw new FigException(@"Script path not configured. Use config --spath database\script");
 
             var scriptName = DateTime.Now.ToString("yyMMddHHmmss");
 
@@ -28,7 +28,7 @@ namespace Fig.Cli.Commands
             var path = ConcatSlash(Context.RootDirectory) + ConcatSlash(Context.Options.DbScriptPath);
 
             if (!Directory.Exists(path))
-                throw new ArgumentException(string.Format(@"Script path {0} not found", path));
+                throw new FigException(string.Format(@"Script path {0} not found", path));
 
             string fileName = path + scriptName;
             WriteScript(fileName, GetTemplate());

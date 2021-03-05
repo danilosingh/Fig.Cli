@@ -180,24 +180,24 @@ namespace Fig.Cli.Commands
         protected void EnsureValidOptions()
         {
             if (string.IsNullOrEmpty(Options.ScriptsDirectory))
-                throw new ArgumentException("Scripts directory not configured.");
+                throw new FigException("Scripts directory not configured.");
 
             if (string.IsNullOrEmpty(Options.Provider))
-                throw new ArgumentException("Provider not configured.");
+                throw new FigException("Provider not configured.");
             else if (Options.Provider != DbProviders.PostgreSql && Options.Provider != DbProviders.SqlServer)
-                throw new ArgumentException("Invalid provider.");
+                throw new FigException("Invalid provider.");
 
             if (Options.Provider == DbProviders.SqlServer && string.IsNullOrEmpty(Options.Server))
-                throw new ArgumentException("Server not configured.");
+                throw new FigException("Server not configured.");
 
             if (string.IsNullOrEmpty(Options.Database))
-                throw new ArgumentException("Database not configured.");
+                throw new FigException("Database not configured.");
 
             if (string.IsNullOrEmpty(Options.UserName))
-                throw new ArgumentException("UserName not configured.");
+                throw new FigException("UserName not configured.");
 
             if (string.IsNullOrEmpty(Options.Password))
-                throw new ArgumentException("Password not configured.");
+                throw new FigException("Password not configured.");
         }
     }
 

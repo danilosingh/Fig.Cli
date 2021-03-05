@@ -53,7 +53,7 @@ namespace Fig.Cli.Commands
 
             if (versionArray.Length < 3)
             {
-                throw new ArgumentException("Invalid release name. (Valid name: 1.0.0)");
+                throw new FigException("Invalid release name. (Valid name: 1.0.0)");
             }
 
             int path = Convert.ToInt32(versionArray[2]);

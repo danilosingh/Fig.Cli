@@ -27,7 +27,7 @@ namespace Fig.Cli
 
             if (property == null)
             {
-                throw new ArgumentException($"Property {name} is invalid");
+                throw new FigException($"Property {name} is invalid");
             }
 
             property.SetValue(Options, value);
