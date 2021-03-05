@@ -52,17 +52,28 @@ namespace Fig.Cli.Commands
 
         private void RunScripts(IList<string> scripts)
         {
+            Console.WriteLine("Begin RunScripts");
             using (var conn = CreateConnection())
             {
+                Console.WriteLine("Connection created");
+
                 var transaction = conn.BeginTransaction();
+                Console.WriteLine("transaction created");
 
                 try
                 {
+                    Console.WriteLine("Try");
+
                     if (!string.IsNullOrEmpty(Options.GreaterThan))
                         Console.WriteLine("Running greater than {0}", Options.GreaterThan);
 
+
+                    Console.WriteLine($"Scripts {scripts.Count}");
+
                     for (int i = 0; i < scripts.Count; i++)
                     {
+                        Console.WriteLine($"Script {i}");
+
                         ExecScript(scripts[i], transaction, scripts.Count, i + 1);
                     }
 
@@ -71,7 +82,7 @@ namespace Fig.Cli.Commands
                 catch (Exception ex)
                 {
                     transaction.Rollback();
-                    throw new Exception("Error on RunScripts", ex);
+                    throw ex;
                 }
             }
         }
