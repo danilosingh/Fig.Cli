@@ -1,8 +1,7 @@
 {
   "profiles": {
     "Fig.Cli": {
-      "commandName": "Project",
-      "commandLineArgs": "migratedb --server 162.214.168.65 --user spedy-stage --password bYFjZahtl@ETK!Gg --db spedy-stage --directory D:\\Danilo\\Source\\Spedy\\src\\api\\scripts --supressconfirm true --provider PostgreSql"
+      "commandName": "Project"
     }
   }
 }

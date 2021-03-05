@@ -3,14 +3,13 @@ using Fig.Cli.Commands;
 using Fig.Cli.Options;
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Linq;
 
 namespace Fig.Cli
 {
     class Program
     {
-        static void Main(string[] args)
+        static int Main(string[] args)
         {
             var exitCode = 0;
 
@@ -74,13 +73,8 @@ namespace Fig.Cli
                 ConsoleWrite($"Error: {GetFormattedException(ex)}");
                 exitCode = 1;
             }
-            finally
-            {
-                if (Debugger.IsAttached)
-                    Console.ReadKey();
 
-                Environment.Exit(exitCode);
-            }
+            return exitCode;
         }
 
         private static string GetFormattedException(Exception ex)
@@ -92,7 +86,7 @@ namespace Fig.Cli
                 exceptions.Add(ex);
                 ex = ex.InnerException;
             }
-            
+
             return string.Join(Environment.NewLine, exceptions.AsEnumerable()
                 .Reverse()
                 .Select(c => $"{c.Message} on {c.StackTrace}"));
