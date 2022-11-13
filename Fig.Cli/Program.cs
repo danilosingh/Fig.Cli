@@ -1,5 +1,6 @@
 ﻿using CommandLine;
 using Fig.Cli.Commands;
+using Fig.Cli.Extensions;
 using Fig.Cli.Options;
 using System;
 using System.Collections.Generic;
@@ -27,6 +28,7 @@ namespace Fig.Cli
                         PullRequestOptions,
                         MergePullRequestOptions,
                         ScriptOptions,
+                        ScriptTemplateOptions,
                         MigrateDbOptions,
                         RunScriptsOptions,
                         ClearBranchesOptions,
@@ -44,6 +46,7 @@ namespace Fig.Cli
                         (PullRequestOptions opts) => CommandFactory.Execute<PullRequestCommand>(opts),
                         (MergePullRequestOptions opts) => CommandFactory.Execute<MergePullRequestCommand>(opts),
                         (ScriptOptions opts) => CommandFactory.Execute<ScriptCommand>(opts),
+                        (ScriptTemplateOptions opts) => CommandFactory.Execute<ScriptTemplateCommand>(opts),
                         (MigrateDbOptions opts) => CommandFactory.Execute<MigrateDbCommand>(opts),
                         (RunScriptsOptions opts) => CommandFactory.Execute<RunScriptsCommand>(opts),
                         (ClearBranchesOptions opts) => CommandFactory.Execute<ClearBranchesCommand>(opts),
@@ -69,7 +72,7 @@ namespace Fig.Cli
             }
             catch (Exception ex)
             {
-                ConsoleWrite($"Error: {GetFormattedException(ex)}");
+                ConsoleWrite(GetFormattedException(ex));
                 exitCode = 1;
             }
 
@@ -82,12 +85,19 @@ namespace Fig.Cli
 
             while (ex.InnerException != null)
             {
-                exceptions.Add(ex);
+                exceptions.Add(ex.InnerException);
                 ex = ex.InnerException;
             }
 
-            return string.Join(Environment.NewLine, exceptions.AsEnumerable()
-                .Reverse()
+            var figException = exceptions.FirstOrDefault(c => c is FigException);
+
+            if (figException != null)
+            {
+                return figException.Message;
+            }
+
+            return "Error: " + string.Join(Environment.NewLine,
+                exceptions.AsEnumerable().Reverse()
                 .Select(c => $"{c.Message} on {c.StackTrace}"));
         }
 

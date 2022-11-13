@@ -1,4 +1,6 @@
-﻿namespace Fig.Cli.Options
+﻿using System.Collections.Generic;
+
+namespace Fig.Cli.Options
 {
     public class FigOptions : BaseOptions
     {
@@ -18,5 +20,11 @@
         public string DbName { get; set; }
         public string DbProvider { get; set; }
         public string DbMigrationsTable { get; set; }
+        public List<FigOptionsScriptTemplate> Templates { get; set; }
+
+        public FigOptions()
+        {
+            Templates = new List<FigOptionsScriptTemplate>();
+        }
     }
 }

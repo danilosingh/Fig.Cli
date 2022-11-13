@@ -27,20 +27,16 @@ namespace Fig.Cli.Commands
 
         private void CheckMigrationSchema()
         {
-            using (var conn = CreateConnection())
+            using var conn = CreateConnection();
+            try
             {
-                try
-                {
-                    using (var cmd = conn.CreateCommand())
-                    {
-                        cmd.CommandText = $"SELECT 1 FROM {Options.MigrationsTable}";
-                        var reader = cmd.ExecuteScalar();
-                    }
-                }
-                catch
-                {
-                    CreateMigrationSchema(conn);
-                }
+                using var cmd = conn.CreateCommand();
+                cmd.CommandText = $"SELECT 1 FROM {Options.MigrationsTable}";
+                var reader = cmd.ExecuteScalar();
+            }
+            catch
+            {
+                CreateMigrationSchema(conn);
             }
         }
 

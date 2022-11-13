@@ -1,7 +1,9 @@
 {
   "profiles": {
     "Fig.Cli": {
-      "commandName": "Project"
+      "commandName": "Project",
+      "commandLineArgs": "script column ",
+      "workingDirectory": "D:\\Danilo\\Source\\Spedy\\src\\api\\Scripts"
     }
   }
 }

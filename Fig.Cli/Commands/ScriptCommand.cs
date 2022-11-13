@@ -2,6 +2,7 @@
 using System;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
 
 namespace Fig.Cli.Commands
@@ -33,7 +34,11 @@ namespace Fig.Cli.Commands
             string fileName = path + scriptName;
             WriteScript(fileName, GetTemplate());
 
-            Process.Start(fileName);
+            using var process = new Process
+            {
+                StartInfo = new ProcessStartInfo(fileName) { UseShellExecute = true }
+            };
+            process.Start();
 
             return Ok("Script {0} created.", fileName);
         }
@@ -47,10 +52,24 @@ namespace Fig.Cli.Commands
 
         private string GetTemplate()
         {
-            return string.Empty.PadLeft(100, '-') + Environment.NewLine +
-            "-- Autor: " + Context.Options.DeveloperName.Replace(Environment.NewLine, string.Empty) + Environment.NewLine +
-            "-- Data: " + DateTime.Now.ToString("dd/MM/yyyy HH:mm") + Environment.NewLine +
-            string.Empty.PadLeft(100, '-') + Environment.NewLine;
+            var script = string.Empty.PadLeft(100, '-') + Environment.NewLine +
+                "-- Autor: " + Context.Options.DeveloperName.Replace(Environment.NewLine, string.Empty) + Environment.NewLine +
+                "-- Data: " + DateTime.Now.ToString("dd/MM/yyyy HH:mm") + Environment.NewLine +
+                string.Empty.PadLeft(100, '-') + Environment.NewLine;
+
+            if (!string.IsNullOrEmpty(Options.TemplateName))
+            {
+                var template = Context.Options.Templates.FirstOrDefault(c => c.Name == Options.TemplateName);
+
+                if (template == null)
+                {
+                    throw new FigException("Template not found.");
+                }
+
+                script += Environment.NewLine + template.Script;
+            }
+
+            return script;
         }
 
         private void WriteScript(string fileName, string contents)

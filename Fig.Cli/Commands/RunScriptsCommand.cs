@@ -140,7 +140,8 @@ namespace Fig.Cli.Commands
                 Host = Options.Server,
                 Database = Options.Database,
                 Password = Options.Password,
-                Username = Options.UserName
+                Username = Options.UserName,
+                CommandTimeout = 900
             };
 
             return new NpgsqlConnection(connectionStringBuilder.ToString());
