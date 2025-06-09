@@ -20,7 +20,7 @@ namespace Fig.Cli.Commands
         }
 
         protected override void PrepareOptions()
-        {
+        {            
             Options.MigrationsTable = Options.MigrationsTable ?? Context.Options.DbMigrationsTable;
             base.PrepareOptions();
         }
@@ -58,7 +58,7 @@ namespace Fig.Cli.Commands
                 Console.WriteLine($"Skiped script {fileName}");
                 return;
             }
-            
+
             base.ExecScript(scriptPath, transaction, count, currentIndex);
 
             SaveExecutedScript(transaction, fileName);
@@ -77,7 +77,7 @@ namespace Fig.Cli.Commands
         private bool AllowExecScript(IDbTransaction transaction, string fileName)
         {
             using (var command = transaction.Connection.CreateCommand())
-            {                
+            {
                 command.CommandText = $"SELECT NULL FROM {Options.MigrationsTable} WHERE script = @script";
                 command.AddParameter("script", fileName);
                 return !command.HasRows();

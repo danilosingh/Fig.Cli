@@ -23,5 +23,7 @@ namespace Fig.Cli.Options
         public string GreaterThan { get; set; }
         [Option("provider", HelpText = "Database provider - PostgreSQl(default), SqlServer")]
         public string Provider { get; set; }
+        [Option("connstring", HelpText = "Connection String")]
+        public string ConnectionString { get; set; }
     }
 }
