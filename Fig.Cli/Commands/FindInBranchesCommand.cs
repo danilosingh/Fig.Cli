@@ -22,16 +22,16 @@ namespace Fig.Cli.Commands
 
             var branches = GitHelper.GetLocalBranches();
 
-            if(Options.OnlyDevBranches)
+            if (Options.OnlyDevBranches)
             {
                 branches = branches.Where(c => c.StartsWith("dev/")).ToList();
             }
 
             var foundedBranches = new List<string>();
-            
+
             foreach (var item in branches)
             {
-                Write($"Searching in {item}... ");
+                Write($"Searching in {item} [{branches.IndexOf(item)}/{branches.Count}]... ");
                 GitHelper.Checkout(item, showCommand: false, writeOutput: false);
 
                 var fileName = Path.Combine(Context.RootDirectory, Options.FileName);
@@ -42,7 +42,11 @@ namespace Fig.Cli.Commands
                 }
                 else
                 {
-                    if(CultureInfo.CurrentCulture.CompareInfo.IndexOf(File.ReadAllText(fileName), Options.SearchText, CompareOptions.IgnoreCase) >= 0)
+                    var text = File.ReadAllText(fileName);
+
+                    if (CultureInfo.CurrentCulture.CompareInfo.IndexOf(text, Options.SearchText, CompareOptions.IgnoreCase) >= 0 ||
+                        CultureInfo.CurrentCulture.CompareInfo.IndexOf(text, "Post()", CompareOptions.IgnoreCase) >= 0 ||
+                        CultureInfo.CurrentCulture.CompareInfo.IndexOf(text, "Create()", CompareOptions.IgnoreCase) >= 0)
                     {
                         foundedBranches.Add(item);
                         WriteLine($"[Found]");
@@ -60,7 +64,7 @@ namespace Fig.Cli.Commands
                 return Ok("Not found.");
 
             WriteLine("Found in branches: \n{0}", string.Join(Environment.NewLine, foundedBranches));
-        
+
             return Ok();
         }
     }

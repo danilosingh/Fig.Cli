@@ -143,7 +143,6 @@ namespace Fig.Cli.Commands
                 Username = Options.UserName,
                 CommandTimeout = 900
             };
-
             return new NpgsqlConnection(connectionStringBuilder.ToString());
         }
 
@@ -176,12 +175,34 @@ namespace Fig.Cli.Commands
         protected virtual void PrepareOptions()
         {
             Options.ScriptsDirectory = Options.ScriptsDirectory ?? StringHelper.ConcatPath(Context.RootDirectory, Context.Options.DbScriptPath);
-            Options.Server = Options.Server ?? Context.Options.DbServer;
-            Options.Database = Options.Database ?? Context.Options.DbName;
-            Options.UserName = Options.UserName ?? Context.Options.DbUserName;
-            Options.Password = Options.Password ?? Context.Options.DbPassword;
             Options.GreaterThan = Options.GreaterThan;
             Options.Provider = Options.Provider ?? Context.Options.DbProvider;
+
+            if (Options.ConnectionString != null)
+            {
+                PopulateOptionsFromConnectionString();
+            }
+            else
+            {
+                Options.Server = Options.Server ?? Context.Options.DbServer;
+                Options.Database = Options.Database ?? Context.Options.DbName;
+                Options.UserName = Options.UserName ?? Context.Options.DbUserName;
+                Options.Password = Options.Password ?? Context.Options.DbPassword;
+            }
+        }
+
+        private void PopulateOptionsFromConnectionString()
+        {
+            if (Options.Provider != DbProviders.PostgreSql)
+            {
+                throw new FigException("Connection string is only supported for PostgreSQL provider.");
+            }
+
+            var builder = new NpgsqlConnectionStringBuilder(Options.ConnectionString);
+            Options.Server = builder.Host;
+            Options.Database = builder.Database;
+            Options.Password = builder.Password;
+            Options.UserName = builder.Username;
         }
 
         protected void EnsureValidOptions()

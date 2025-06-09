@@ -22,8 +22,7 @@ namespace Fig.Cli.Helpers
             procStartInfo.CreateNoWindow = true;
             System.Diagnostics.Process proc = new System.Diagnostics.Process();
             proc.StartInfo = procStartInfo;
-            proc.Start();
-            proc.WaitForExit();
+            proc.Start();            
             string output = proc.StandardOutput.ReadToEnd() + proc.StandardError.ReadToEnd();
 
             if (writeOutput)
