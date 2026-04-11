@@ -100,14 +100,14 @@ namespace Fig.Cli.Commands
 
         private string GetLastScriptName()
         {
-            string path = StringHelper.ConcatPath(Context.RootDirectory, Context.Options.DbScriptPath);
+            string path = Path.Combine(Context.RootDirectory, Context.Options.DbScriptPath);
             return Directory.GetFiles(path).Select(c => Path.GetFileName(c)).OrderByDescending(c => c).FirstOrDefault();
         }
 
         private void SaveFileVersion(VersionInfo versionInfo)
         {            
             var json = JsonConvert.SerializeObject(versionInfo);
-            File.WriteAllText(Context.FigDirectory + @"\.version", json, Encoding.UTF8);
+            File.WriteAllText(Path.Combine(Context.FigDirectory, ".version"), json, Encoding.UTF8);
         }
     }
 }

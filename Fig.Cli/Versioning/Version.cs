@@ -41,7 +41,7 @@ namespace Fig.Cli.Versioning
 
         public static VersionInfo LoadVersion()
         {
-            var versionFileName = StringHelper.ConcatPath(FigContext.Instance.FigDirectory, @".version");
+            var versionFileName = Path.Combine(FigContext.Instance.FigDirectory, ".version");
 
             if (!File.Exists(versionFileName))
                 return null;

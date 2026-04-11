@@ -26,12 +26,12 @@ namespace Fig.Cli.Commands
 
             scriptName += ".sql";
 
-            var path = ConcatSlash(Context.RootDirectory) + ConcatSlash(Context.Options.DbScriptPath);
+            var path = Path.Combine(Context.RootDirectory, Context.Options.DbScriptPath);
 
             if (!Directory.Exists(path))
                 throw new FigException(string.Format(@"Script path {0} not found", path));
 
-            string fileName = path + scriptName;
+            string fileName = Path.Combine(path, scriptName);
             WriteScript(fileName, GetTemplate());
 
             using var process = new Process
@@ -41,13 +41,6 @@ namespace Fig.Cli.Commands
             process.Start();
 
             return Ok("Script {0} created.", fileName);
-        }
-
-        private string ConcatSlash(string path)
-        {
-            if (path[path.Length - 1] != '\\')
-                path += @"\";
-            return path;
         }
 
         private string GetTemplate()
