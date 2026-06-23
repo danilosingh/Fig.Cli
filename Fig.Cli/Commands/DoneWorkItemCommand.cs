@@ -23,7 +23,7 @@ namespace Fig.Cli.Commands
         {
             var workItems = GetWorkItemsInProgress();
 
-            if (!Confirm(workItems))
+            if (!Options.Yes && !Confirm(workItems))
                 return Canceled();
 
             AddStep(Options.Commit, () => Commit());

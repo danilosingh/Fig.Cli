@@ -11,10 +11,19 @@ namespace Fig.Cli.Options
         [Option('r', "release", HelpText = "Release source from create branch")]
         public string Release { get; set; }
 
+        [Option("from", HelpText = "Source branch to create from (default: repo default branch, ex: develop/master)")]
+        public string From { get; set; }
+
         [Option("noprune", HelpText = "Disable clear local branches")]
         public bool NoPrune { get; set; }
 
+        [Option('y', "yes", HelpText = "Skip confirmations (non-interactive)")]
+        public bool Yes { get; set; }
+
         [Option("runscripts", HelpText = "Run script from database scripts folder", Default = true)]
         public bool RunDbScripts { get; set; }
+
+        [Option("worktree", HelpText = "Create the branch in a git worktree under .claude/worktrees instead of checking out in place")]
+        public bool Worktree { get; set; }
     }
 }

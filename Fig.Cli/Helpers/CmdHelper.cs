@@ -10,8 +10,18 @@ namespace Fig.Cli.Helpers
             if (writeCommand)
                 Console.WriteLine((useCommandIndicator ? "> " : "") + command);
 
-            System.Diagnostics.ProcessStartInfo procStartInfo =
-                new System.Diagnostics.ProcessStartInfo("cmd", "/c " + command);
+            // Cross-platform: Windows usa cmd /c; macOS/Linux usa /bin/sh -c.
+            System.Diagnostics.ProcessStartInfo procStartInfo;
+            if (OperatingSystem.IsWindows())
+            {
+                procStartInfo = new System.Diagnostics.ProcessStartInfo("cmd", "/c " + command);
+            }
+            else
+            {
+                procStartInfo = new System.Diagnostics.ProcessStartInfo("/bin/sh");
+                procStartInfo.ArgumentList.Add("-c");
+                procStartInfo.ArgumentList.Add(command);
+            }
 
             if (!string.IsNullOrEmpty(workingDirectory))
                 procStartInfo.WorkingDirectory = workingDirectory;

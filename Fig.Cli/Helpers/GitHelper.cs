@@ -107,6 +107,17 @@ namespace Fig.Cli.Helpers
 
         public static string FindRootDirectory()
         {
+            // Work root: a raiz do checkout atual. Dentro de um worktree, retorna o
+            // diretorio do worktree (e nao o repo principal). Usa rev-parse porque o
+            // .git de um worktree e um ARQUIVO (nao diretorio) — o dir-walk por
+            // Directory.Exists(".git") subiria ate o repo principal. Nao usa
+            // ExecuteCommad (depende de FigContext.Instance, ainda em construcao).
+            var topLevel = RunGitRaw("rev-parse --show-toplevel");
+
+            if (!string.IsNullOrEmpty(topLevel))
+                return Path.GetFullPath(topLevel);
+
+            // Fallback (fora de repo / git indisponivel): dir-walk pelo .git.
             var current = Directory.GetCurrentDirectory();
 
             while (!string.IsNullOrEmpty(current))
@@ -120,6 +131,38 @@ namespace Fig.Cli.Helpers
             }
 
             return current;
+        }
+
+        public static string FindConfigDirectory()
+        {
+            // Config root: a raiz onde mora o .fig (PAT + config de banco). Dentro de
+            // um worktree, o .git comum aponta pro repo principal — o pai dele e o
+            // config root. Assim o fig acha o .fig/.conf mesmo rodando de um worktree
+            // (o .fig e gitignored e nao existe no worktree recem-criado).
+            var commonDir = RunGitRaw("rev-parse --path-format=absolute --git-common-dir");
+
+            if (!string.IsNullOrEmpty(commonDir))
+            {
+                var parent = Directory.GetParent(Path.GetFullPath(commonDir))?.FullName;
+
+                if (!string.IsNullOrEmpty(parent))
+                    return parent;
+            }
+
+            return FindRootDirectory();
+        }
+
+        private static string RunGitRaw(string args)
+        {
+            try
+            {
+                var result = CmdHelper.ExecuteCommand("git " + args, Directory.GetCurrentDirectory(), false, false, false);
+                return result.IsSuccess ? result.Output?.Trim() : null;
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         public static bool Commit(string commitMessage, bool checkHasChangesBeforeCommit = false, bool showCommand = true)

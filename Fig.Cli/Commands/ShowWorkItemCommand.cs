@@ -37,9 +37,13 @@ namespace Fig.Cli.Commands
             if (parent != null)
                 parentId = parent.Url.Substring(parent.Url.LastIndexOf('/') + 1);
 
+            var tags = Field("System.Tags");
+
             var sb = new StringBuilder();
             sb.AppendLine($"# {Field("System.Title")}");
             sb.AppendLine($"Id: {wi.Id} | Tipo: {type} | Estado: {Field("System.State")} | Parent: {parentId}");
+            if (!string.IsNullOrWhiteSpace(tags))
+                sb.AppendLine($"Tags: {tags}");
             sb.AppendLine();
             sb.AppendLine(type == "Bug" ? "## Repro Steps" : "## Descrição");
             sb.AppendLine(body);

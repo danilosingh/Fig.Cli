@@ -55,7 +55,17 @@ namespace Fig.Cli
                 rootDirectory = Directory.GetCurrentDirectory();
             }
 
-            figDirectory = Path.Combine(rootDirectory, ".fig");
+            // Config root pode diferir do work root quando rodando de um worktree:
+            // git/scripts saem do worktree (rootDirectory), mas o .fig/.conf mora no
+            // repo principal. Fora de worktree, ambos coincidem (comportamento atual).
+            var configDirectory = GitHelper.FindConfigDirectory();
+
+            if (string.IsNullOrEmpty(configDirectory))
+            {
+                configDirectory = rootDirectory;
+            }
+
+            figDirectory = Path.Combine(configDirectory, ".fig");
         }
 
         public void LoadOptions()
