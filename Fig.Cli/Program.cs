@@ -16,44 +16,26 @@ namespace Fig.Cli
 
             try
             {
-                var result = Parser.Default
-                    .ParseArguments<
-                        InitOptions,
-                        StartWorkItemOptions,
-                        DoneWorkItemOptions,
-                        SyncOptions,
-                        MergeOptions,
-                        RebaseOptions,
-                        ReleaseOptions,
-                        PullRequestOptions,
-                        MergePullRequestOptions,
-                        ScriptOptions,
-                        ScriptTemplateOptions,
-                        MigrateDbOptions,
-                        RunScriptsOptions,
-                        ClearBranchesOptions,
-                        FindInBranchesOptions,
-                        SetOptions,
-                        GuidOptions>(args)
-                    .MapResult(
-                        (InitOptions opts) => CommandFactory.Execute<InitCommand>(opts),
-                        (StartWorkItemOptions opts) => CommandFactory.Execute<StartWorkItemCommand>(opts),
-                        (DoneWorkItemOptions opts) => CommandFactory.Execute<DoneWorkItemCommand>(opts),
-                        (SyncOptions opts) => CommandFactory.Execute<SyncCommand>(opts),
-                        (MergeOptions opts) => CommandFactory.Execute<MergeCommand>(opts),
-                        (RebaseOptions opts) => CommandFactory.Execute<RebaseCommand>(opts),
-                        (ReleaseOptions opts) => CommandFactory.Execute<ReleaseCommand>(opts),
-                        (PullRequestOptions opts) => CommandFactory.Execute<PullRequestCommand>(opts),
-                        (MergePullRequestOptions opts) => CommandFactory.Execute<MergePullRequestCommand>(opts),
-                        (ScriptOptions opts) => CommandFactory.Execute<ScriptCommand>(opts),
-                        (ScriptTemplateOptions opts) => CommandFactory.Execute<ScriptTemplateCommand>(opts),
-                        (MigrateDbOptions opts) => CommandFactory.Execute<MigrateDbCommand>(opts),
-                        (RunScriptsOptions opts) => CommandFactory.Execute<RunScriptsCommand>(opts),
-                        (ClearBranchesOptions opts) => CommandFactory.Execute<ClearBranchesCommand>(opts),
-                        (FindInBranchesOptions opts) => CommandFactory.Execute<FindInBranchesCommand>(opts),
-                        (SetOptions opts) => CommandFactory.Execute<SetOptionCommand>(opts),
-                        (GuidOptions opts) => CommandFactory.Execute<GuidCommand>(opts),
-                        (errs) => new CommandResult(false));
+                var optionTypes = new[]
+                {
+                    typeof(InitOptions), typeof(StartWorkItemOptions), typeof(DoneWorkItemOptions),
+                    typeof(SyncOptions), typeof(MergeOptions), typeof(RebaseOptions),
+                    typeof(ReleaseOptions), typeof(PullRequestOptions), typeof(MergePullRequestOptions),
+                    typeof(ScriptOptions), typeof(ScriptTemplateOptions), typeof(MigrateDbOptions),
+                    typeof(RunScriptsOptions), typeof(ClearBranchesOptions), typeof(FindInBranchesOptions),
+                    typeof(SetOptions), typeof(GuidOptions), typeof(CreatePbiOptions),
+                    typeof(CreateBugOptions), typeof(EditWorkItemOptions), typeof(ShowWorkItemOptions),
+                    typeof(CommentWorkItemOptions), typeof(ListWorkItemOptions), typeof(CreateFeatureOptions),
+                    typeof(CreateTaskOptions)
+                };
+
+                CommandResult result = null;
+
+                Parser.Default.ParseArguments(args, optionTypes)
+                    .WithParsed(opts => result = Dispatch((BaseOptions)opts))
+                    .WithNotParsed(_ => result = new CommandResult(false));
+
+                result ??= new CommandResult(false);
 
                 if (!result.IsValid)
                 {
@@ -77,6 +59,39 @@ namespace Fig.Cli
             }
 
             return exitCode;
+        }
+
+        private static CommandResult Dispatch(BaseOptions opts)
+        {
+            switch (opts)
+            {
+                case InitOptions o: return CommandFactory.Execute<InitCommand>(o);
+                case StartWorkItemOptions o: return CommandFactory.Execute<StartWorkItemCommand>(o);
+                case DoneWorkItemOptions o: return CommandFactory.Execute<DoneWorkItemCommand>(o);
+                case SyncOptions o: return CommandFactory.Execute<SyncCommand>(o);
+                case MergeOptions o: return CommandFactory.Execute<MergeCommand>(o);
+                case RebaseOptions o: return CommandFactory.Execute<RebaseCommand>(o);
+                case ReleaseOptions o: return CommandFactory.Execute<ReleaseCommand>(o);
+                case PullRequestOptions o: return CommandFactory.Execute<PullRequestCommand>(o);
+                case MergePullRequestOptions o: return CommandFactory.Execute<MergePullRequestCommand>(o);
+                case ScriptOptions o: return CommandFactory.Execute<ScriptCommand>(o);
+                case ScriptTemplateOptions o: return CommandFactory.Execute<ScriptTemplateCommand>(o);
+                case MigrateDbOptions o: return CommandFactory.Execute<MigrateDbCommand>(o);
+                case RunScriptsOptions o: return CommandFactory.Execute<RunScriptsCommand>(o);
+                case ClearBranchesOptions o: return CommandFactory.Execute<ClearBranchesCommand>(o);
+                case FindInBranchesOptions o: return CommandFactory.Execute<FindInBranchesCommand>(o);
+                case SetOptions o: return CommandFactory.Execute<SetOptionCommand>(o);
+                case GuidOptions o: return CommandFactory.Execute<GuidCommand>(o);
+                case CreatePbiOptions o: return CommandFactory.Execute<CreatePbiCommand>(o);
+                case CreateBugOptions o: return CommandFactory.Execute<CreateBugCommand>(o);
+                case EditWorkItemOptions o: return CommandFactory.Execute<EditWorkItemCommand>(o);
+                case ShowWorkItemOptions o: return CommandFactory.Execute<ShowWorkItemCommand>(o);
+                case CommentWorkItemOptions o: return CommandFactory.Execute<CommentWorkItemCommand>(o);
+                case ListWorkItemOptions o: return CommandFactory.Execute<ListWorkItemCommand>(o);
+                case CreateFeatureOptions o: return CommandFactory.Execute<CreateFeatureCommand>(o);
+                case CreateTaskOptions o: return CommandFactory.Execute<CreateTaskCommand>(o);
+                default: return new CommandResult(false);
+            }
         }
 
         private static string GetFormattedException(Exception ex)
