@@ -8,7 +8,7 @@ namespace Fig.Cli.Options
         [Value(0, Required = true, HelpText = "Work item title")]
         public string Title { get; set; }
 
-        [Option("desc-file", Required = true, HelpText = "Markdown file with the Repro Steps (## Sintoma ...)")]
+        [Option("desc-file", HelpText = "Markdown file with the Repro Steps (## Sintoma ...). Optional: omit for a title-only capture (New state, triage later)")]
         public string DescFile { get; set; }
 
         [Option("ac-file", HelpText = "Markdown file with the Definicao de corrigido")]

@@ -26,14 +26,20 @@ namespace Fig.Cli.Commands
             if (string.IsNullOrWhiteSpace(Options.Title))
                 throw new FigException("Title is required.");
 
-            if (string.IsNullOrEmpty(Options.DescFile) || !File.Exists(Options.DescFile))
-                throw new FigException($"Description file not found: {Options.DescFile}");
-
             var patch = new JsonPatchDocument
             {
-                WorkItemContent.Field("System.Title", Options.Title),
-                WorkItemContent.Field(BodyFieldRefName, WorkItemContent.ToHtml(Options.DescFile))
+                WorkItemContent.Field("System.Title", Options.Title)
             };
+
+            // Corpo e opcional: sem --desc-file e uma captura so-titulo (item nasce
+            // em New pra triagem depois). Se um caminho foi informado, ele tem que existir.
+            if (!string.IsNullOrEmpty(Options.DescFile))
+            {
+                if (!File.Exists(Options.DescFile))
+                    throw new FigException($"Description file not found: {Options.DescFile}");
+
+                patch.Add(WorkItemContent.Field(BodyFieldRefName, WorkItemContent.ToHtml(Options.DescFile)));
+            }
 
             if (!string.IsNullOrEmpty(Options.AcFile))
             {
