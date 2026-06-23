@@ -2,8 +2,8 @@
   "profiles": {
     "Fig.Cli": {
       "commandName": "Project",
-      "commandLineArgs": "migratedb --connstring \"Server=xxxx; Port=1433; User Id=postgres; Password=***REMOVED***; Database=spedysandbox\" --directory \"C:\\Users\\danil\\source\\repos\\Spedy\\src\\api\\Scripts\"",
-      "workingDirectory": "C:\\Users\\danil\\source\\repos\\Spedy"
+      "commandLineArgs": "migratedb --connstring \"Server=localhost; Port=5432; User Id=postgres; Password=<senha-local>; Database=<banco-local>\" --directory \"src/api/Scripts\"",
+      "workingDirectory": "<caminho-do-repo>"
     }
   }
 }
