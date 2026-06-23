@@ -67,10 +67,10 @@ namespace Fig.Cli.Commands
 
                 transaction.Commit();
             }
-            catch (Exception ex)
+            catch
             {
                 transaction.Rollback();
-                throw ex;
+                throw;
             }
         }
 
@@ -90,7 +90,7 @@ namespace Fig.Cli.Commands
             catch (Exception ex)
             {
                 Console.WriteLine($"Error on script: {scriptPath} / Message: {ex.Message}");
-                throw ex;
+                throw;
             }
         }
 
@@ -174,7 +174,7 @@ namespace Fig.Cli.Commands
 
         protected virtual void PrepareOptions()
         {
-            Options.ScriptsDirectory = Options.ScriptsDirectory ?? StringHelper.ConcatPath(Context.RootDirectory, Context.Options.DbScriptPath);
+            Options.ScriptsDirectory = Options.ScriptsDirectory ?? Path.Combine(Context.RootDirectory, Context.Options.DbScriptPath);
             Options.GreaterThan = Options.GreaterThan;
             Options.Provider = Options.Provider ?? Context.Options.DbProvider;
 

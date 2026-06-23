@@ -6,7 +6,7 @@ namespace Fig.Cli.Options
     public class RunScriptsOptions : BaseOptions
     {
         [Option('s',"server", HelpText = "Server Instance - for SqlServer")]
-        public string Server { get; internal set; }
+        public string Server { get; set; }
         [Option('d', "db", HelpText = "Database name")]
         public string Database { get; set; }
         [Option('u', "user", HelpText = "User")]

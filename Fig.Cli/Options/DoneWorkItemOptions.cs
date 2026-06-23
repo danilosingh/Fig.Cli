@@ -17,6 +17,9 @@ namespace Fig.Cli.Options
         [Option('c', "commit", HelpText = "Commit all changes")]
         public string CommitMessage { get; set; }
 
+        [Option('y', "yes", HelpText = "Skip confirmations (non-interactive)")]
+        public bool Yes { get; set; }
+
         public bool Commit { get { return !string.IsNullOrEmpty(CommitMessage); } }
     }
 }

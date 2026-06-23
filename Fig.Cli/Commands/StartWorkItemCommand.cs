@@ -9,6 +9,7 @@ using Microsoft.VisualStudio.Services.WebApi.Patch;
 using Microsoft.VisualStudio.Services.WebApi.Patch.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace Fig.Cli.Commands
@@ -31,7 +32,9 @@ namespace Fig.Cli.Commands
 
             var project = AzureProjectHelper.FindDefaultProject(AzureContext);
             var repo = AzureGitHelper.FindRepository(AzureContext, project.Id, Context.Options.RepositoryName);
-            var defaultBranchName = AzureGitHelper.WithoutRefsPrefix(repo.DefaultBranch);
+            var defaultBranchName = !string.IsNullOrEmpty(Options.From)
+                ? (Options.From.StartsWith("heads/") ? Options.From : "heads/" + Options.From)
+                : AzureGitHelper.WithoutRefsPrefix(repo.DefaultBranch);
             var defaultBranch = gitClient.GetRefsAsync(repo.Id, filter: defaultBranchName).Result.First();
             var workitem = GetWorkItem(Options.WorkItemId);
             var relatedWorkitems = GetAllRelatedWorkdItems(workitem);
@@ -52,7 +55,7 @@ namespace Fig.Cli.Commands
 
             if (newBranch == null || !newBranch.Name.EndsWith(branchPatch))
             {
-                if (!Confirm("Confirm branch creation: {0} [Enter]", branchName))
+                if (!Options.Yes && !Confirm("Confirm branch creation: {0} [Enter]", branchName))
                     return Canceled();
 
                 newBranch = CreateBranch(repo, releaseBranch ?? defaultBranch, fullBranchPatch, branchName);
@@ -60,14 +63,20 @@ namespace Fig.Cli.Commands
 
             LinkWorkItems(project, repo, newBranch, branchName, relatedWorkitems);
             StartFirstTask(workitem, relatedWorkitems);
-            ConfigureLocalGit(branchName);
+
+            if (Options.Worktree)
+                ConfigureWorktree(branchName);
+            else
+                ConfigureLocalGit(branchName);
 
             if (!Options.NoPrune)
                 ClearLocalBranches();
 
             var result = Ok();
 
-            if (Options.RunDbScripts)
+            // No modo worktree a migracao roda DEPOIS, ja dentro do worktree (cwd
+            // movido pelo EnterWorktree), pra ler os scripts da branch correta.
+            if (Options.RunDbScripts && !Options.Worktree)
             {
                 result = MigrateDatabase();
             }
@@ -149,6 +158,11 @@ namespace Fig.Cli.Commands
                     return;
 
                 task = tasks.FirstOrDefault(c => c.GetField<string>("System.State") == "To Do");
+
+                // Sem Task disponivel: cria uma Task de desenvolvimento sob o item, atribuida
+                // ao dev, para que o fig done a encontre (ele filtra Tasks In Progress do dev).
+                if (task == null)
+                    task = CreateDevelopmentTask(workItem);
             }
 
             if (task == null)
@@ -165,6 +179,37 @@ namespace Fig.Cli.Commands
             };
 
             workItemTrackingClient.UpdateWorkItemAsync(patchDocument, (int)task.Id).Wait();
+        }
+
+        private WorkItem CreateDevelopmentTask(WorkItem parent)
+        {
+            var patch = new JsonPatchDocument
+            {
+                new JsonPatchOperation()
+                {
+                    Operation = Operation.Add,
+                    Path = "/fields/System.Title",
+                    Value = "Desenvolvimento"
+                },
+                new JsonPatchOperation()
+                {
+                    Operation = Operation.Add,
+                    Path = "/fields/System.AssignedTo",
+                    Value = Context.Options.UserName
+                },
+                new JsonPatchOperation()
+                {
+                    Operation = Operation.Add,
+                    Path = "/relations/-",
+                    Value = new
+                    {
+                        rel = "System.LinkTypes.Hierarchy-Reverse",
+                        url = $"{Context.Options.ProjectUrl}/_apis/wit/workItems/{parent.Id}"
+                    }
+                }
+            };
+
+            return workItemTrackingClient.CreateWorkItemAsync(patch, Context.Options.ProjectName, "Task").Result;
         }
 
         private List<WorkItem> GetAllRelatedWorkdItems(WorkItem workitem)
@@ -198,6 +243,36 @@ namespace Fig.Cli.Commands
                 "git fetch -p",
                 "git checkout dev/" + branchName,
                 "git pull");
+        }
+
+        private void ConfigureWorktree(string branchName)
+        {
+            var worktreePath = Path.Combine(Context.RootDirectory, ".claude", "worktrees", branchName);
+
+            GitHelper.ExecuteCommads("git fetch -p");
+
+            // Idempotente: se o worktree ja existe (resume), so reaproveita.
+            if (!WorktreeExists(worktreePath))
+            {
+                var add = GitHelper.ExecuteCommads(
+                    $"git worktree add \"{worktreePath}\" dev/{branchName}");
+
+                if (!add.IsSuccess)
+                    throw new FigException($"Failed to create worktree at {worktreePath}");
+            }
+
+            // Ultima linha machine-readable: o /dev faz parse pra chamar EnterWorktree.
+            Console.WriteLine("FIG_WORKTREE=" + worktreePath);
+        }
+
+        private bool WorktreeExists(string worktreePath)
+        {
+            var list = CmdHelper.ExecuteCommand("git worktree list", Context.RootDirectory, false, false, false);
+            var fullPath = Path.GetFullPath(worktreePath);
+
+            return Directory.Exists(worktreePath) ||
+                (list.IsSuccess && list.Output != null &&
+                 list.Output.Contains(fullPath, StringComparison.OrdinalIgnoreCase));
         }
 
         private void LinkWorkItems(TeamProjectReference project, GitRepository repo, GitRef newBranch, string branchName, List<WorkItem> relatedWorkitems)
