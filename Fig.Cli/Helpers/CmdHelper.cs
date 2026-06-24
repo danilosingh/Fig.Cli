@@ -32,8 +32,13 @@ namespace Fig.Cli.Helpers
             procStartInfo.CreateNoWindow = true;
             System.Diagnostics.Process proc = new System.Diagnostics.Process();
             proc.StartInfo = procStartInfo;
-            proc.Start();            
+            proc.Start();
             string output = proc.StandardOutput.ReadToEnd() + proc.StandardError.ReadToEnd();
+
+            // ReadToEnd() retornar (EOF dos pipes) NAO garante que o processo encerrou;
+            // sem WaitForExit, ler proc.ExitCode pode disparar "Process must exit before
+            // requested information can be determined" em comandos rapidos (race).
+            proc.WaitForExit();
 
             if (writeOutput)
                 Console.Write(output);
