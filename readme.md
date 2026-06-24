@@ -62,7 +62,8 @@ Principais chaves:
 | `fig merge` | Faz merge de outra branch |
 | `fig rebase` | Rebase a partir de outra branch |
 | `fig release` | Configura a versão de release |
-| `fig pullr` | Abre a página de Pull Request (branch atual → master) |
+| `fig pr [<título>] [-t <target>] [-d <desc>] [--draft]` | **Cria** o PR via API (headless) da branch atual → target (default: branch padrão do repo); idempotente — retorna o PR ativo se já existir |
+| `fig pullr` | Abre a **página** de criação de Pull Request no navegador (branch atual → master) |
 | `fig mergepull` | Faz merge das mudanças do PR de destino em outra branch |
 | `fig cleardevbranches` | Remove branches de desenvolvimento locais e remotas |
 | `fig findinbranches` | Busca um termo em todas as branches locais |
@@ -80,8 +81,8 @@ Principais chaves:
 
 | Comando | O que faz |
 | --- | --- |
-| `fig pbi <título> --desc-file <md> [--ac-file <md>] [--parent <id>]` | Cria um Product Backlog Item |
-| `fig bug <título> --desc-file <md> [--ac-file <md>] [--parent <id>]` | Cria um Bug |
+| `fig pbi <título> [--desc-file <md>] [--ac-file <md>] [--parent <id>]` | Cria um Product Backlog Item (sem `--desc-file` = captura só com título, nasce em New) |
+| `fig bug <título> [--desc-file <md>] [--ac-file <md>] [--parent <id>]` | Cria um Bug (sem `--desc-file` = captura só com título, nasce em New) |
 | `fig feature <título> --desc-file <md> [--ac-file <md>] [--parent <id>]` | Cria uma Feature |
 | `fig task <parent-id> <título> [--desc-file <md>]` | Cria uma Task sob um work item pai |
 | `fig edit <id> [--title <t>] [--desc-file <md>] [--ac-file <md>]` | Edita um work item existente; atualização parcial |
