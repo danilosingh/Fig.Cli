@@ -26,7 +26,7 @@ namespace Fig.Cli
                     typeof(SetOptions), typeof(GuidOptions), typeof(CreatePbiOptions),
                     typeof(CreateBugOptions), typeof(EditWorkItemOptions), typeof(ShowWorkItemOptions),
                     typeof(CommentWorkItemOptions), typeof(ListWorkItemOptions), typeof(CreateFeatureOptions),
-                    typeof(CreateTaskOptions)
+                    typeof(CreateTaskOptions), typeof(CreatePullRequestOptions)
                 };
 
                 CommandResult result = null;
@@ -90,6 +90,7 @@ namespace Fig.Cli
                 case ListWorkItemOptions o: return CommandFactory.Execute<ListWorkItemCommand>(o);
                 case CreateFeatureOptions o: return CommandFactory.Execute<CreateFeatureCommand>(o);
                 case CreateTaskOptions o: return CommandFactory.Execute<CreateTaskCommand>(o);
+                case CreatePullRequestOptions o: return CommandFactory.Execute<CreatePullRequestCommand>(o);
                 default: return new CommandResult(false);
             }
         }
