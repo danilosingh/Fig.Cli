@@ -222,7 +222,7 @@ namespace Fig.Cli.Commands
                 {
                     Operation = Operation.Add,
                     Path = "/fields/System.Title",
-                    Value = "Desenvolvimento"
+                    Value = string.IsNullOrWhiteSpace(Options.TaskTitle) ? "Desenvolvimento" : Options.TaskTitle
                 },
                 new JsonPatchOperation()
                 {

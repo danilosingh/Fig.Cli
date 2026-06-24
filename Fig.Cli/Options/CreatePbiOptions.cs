@@ -16,5 +16,8 @@ namespace Fig.Cli.Options
 
         [Option("parent", HelpText = "Parent Feature id (optional)")]
         public int? Parent { get; set; }
+
+        [Option("ref", HelpText = "Referencia externa (ex: ticket de suporte SUS-629) — gravada como tag; torna a criacao idempotente (nao duplica)")]
+        public string ExternalRef { get; set; }
     }
 }

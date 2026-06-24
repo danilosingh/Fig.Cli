@@ -25,5 +25,8 @@ namespace Fig.Cli.Options
 
         [Option("worktree", HelpText = "Create the branch in a git worktree under .claude/worktrees instead of checking out in place")]
         public bool Worktree { get; set; }
+
+        [Option("task-title", HelpText = "Titulo da Task de desenvolvimento criada automaticamente (default: \"Desenvolvimento\")")]
+        public string TaskTitle { get; set; }
     }
 }
