@@ -20,6 +20,9 @@ namespace Fig.Cli.Options
         public string DbName { get; set; }
         public string DbProvider { get; set; }
         public string DbMigrationsTable { get; set; }
+        public string JiraBaseUrl { get; set; }
+        public string JiraEmail { get; set; }
+        public string JiraToken { get; set; }
         public List<FigOptionsScriptTemplate> Templates { get; set; }
 
         public FigOptions()

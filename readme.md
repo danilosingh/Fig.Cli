@@ -46,6 +46,9 @@ Principais chaves:
 | `DbScriptPath` | Pasta dos scripts SQL de migração |
 | `DbServer` / `DbName` / `DbUserName` / `DbPassword` / `DbProvider` | Conexão do banco **local** pro `migratedb` |
 | `DbMigrationsTable` | Tabela de controle de migrações |
+| `JiraBaseUrl` | URL do Jira Cloud (ex: `https://spedy.atlassian.net`) |
+| `JiraEmail` | E-mail da conta Jira do dev |
+| `JiraToken` | API token do Jira (**segredo**) — gere em `id.atlassian.com` → Security → API tokens |
 
 ---
 
@@ -89,6 +92,19 @@ Principais chaves:
 | `fig show <id>` | Mostra um work item (título, corpo, critérios) em texto |
 | `fig comment <id> "<texto>"` (ou `--file <md>`) | Adiciona um comentário ao work item |
 | `fig list [--mine] [--state <s>] [--type <t>] [--top <n>]` | Lista work items (`--mine` = atribuídos a você) |
+
+### Jira (Suporte / Sustentação)
+
+Ponte com o Jira Cloud pra trazer demanda de suporte (ex: `SUS-629`, `SUP-…`) pro ADO. Auth por **API token** do próprio dev (`JiraBaseUrl`/`JiraEmail`/`JiraToken` no `.fig/.conf`); o token age com as permissões do dev e **nunca** é impresso.
+
+| Comando | O que faz |
+| --- | --- |
+| `fig jira <KEY>` | Lê o issue (título, descrição, tipo, status) em texto |
+| `fig jira <KEY> --json` | Igual, em JSON (pra consumo por script/agente) |
+| `fig jira <KEY> --comment "<texto>"` | Adiciona um comentário ao issue |
+| `fig jira <KEY> --transition "<status>"` | Move o issue para um status pelo nome (ex: `"Em andamento"`) |
+
+Fluxo típico (suporte → dev): `fig jira SUS-629` (lê) → cria o Bug/PBI no ADO a partir do conteúdo → `fig start <id>` → `fig jira SUS-629 --comment "Tratado no ADO #<id>"` `--transition "Em andamento"`.
 
 ### Utilitários
 

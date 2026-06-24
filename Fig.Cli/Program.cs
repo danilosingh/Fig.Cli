@@ -26,7 +26,7 @@ namespace Fig.Cli
                     typeof(SetOptions), typeof(GuidOptions), typeof(CreatePbiOptions),
                     typeof(CreateBugOptions), typeof(EditWorkItemOptions), typeof(ShowWorkItemOptions),
                     typeof(CommentWorkItemOptions), typeof(ListWorkItemOptions), typeof(CreateFeatureOptions),
-                    typeof(CreateTaskOptions), typeof(CreatePullRequestOptions)
+                    typeof(CreateTaskOptions), typeof(CreatePullRequestOptions), typeof(JiraOptions)
                 };
 
                 CommandResult result = null;
@@ -91,6 +91,7 @@ namespace Fig.Cli
                 case CreateFeatureOptions o: return CommandFactory.Execute<CreateFeatureCommand>(o);
                 case CreateTaskOptions o: return CommandFactory.Execute<CreateTaskCommand>(o);
                 case CreatePullRequestOptions o: return CommandFactory.Execute<CreatePullRequestCommand>(o);
+                case JiraOptions o: return CommandFactory.Execute<JiraCommand>(o);
                 default: return new CommandResult(false);
             }
         }
