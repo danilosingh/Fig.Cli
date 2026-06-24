@@ -43,6 +43,11 @@ namespace Fig.Cli.Helpers
             return ExecuteCommad("git rev-parse --abbrev-ref HEAD", false).Output?.Trim('\n');
         }
 
+        public static string GetLastCommitSubject()
+        {
+            return ExecuteCommad("git log -1 --pretty=%s", false, false, false).Output?.Trim();
+        }
+
         public static bool Sync(bool showCommand = true)
         {
             if (!Pull(showCommand) || !Push(showCommand))
