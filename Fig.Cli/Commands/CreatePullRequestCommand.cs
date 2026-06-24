@@ -1,17 +1,24 @@
+using Fig.Cli.Extensions;
 using Fig.Cli.Helpers;
 using Fig.Cli.Options;
+using Fig.Cli.TeamFoundation.Helpers;
 using Microsoft.TeamFoundation.SourceControl.WebApi;
+using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
+using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace Fig.Cli.Commands
 {
     public class CreatePullRequestCommand : AzureDevOpsCommand<CreatePullRequestOptions>
     {
         private readonly GitHttpClient gitClient;
+        private readonly WorkItemTrackingHttpClient workItemTrackingClient;
 
         public CreatePullRequestCommand(CreatePullRequestOptions opts, FigContext context) : base(opts, context)
         {
             gitClient = AzureContext.Connection.GetClient<GitHttpClient>();
+            workItemTrackingClient = AzureContext.Connection.GetClient<WorkItemTrackingHttpClient>();
         }
 
         public override CommandResult Execute()
@@ -53,7 +60,40 @@ namespace Fig.Cli.Commands
                 IsDraft = Options.Draft
             }, repo.Id).Result;
 
+            MoveWorkItemToReview(source);
+
             return Ok("PR #{0} criado: {1}", created.PullRequestId, BuildPrUrl(project.Name, repo.Name, created.PullRequestId));
+        }
+
+        // Ao abrir o PR, o item de backlog sai de Committed e entra em Review (aguardando
+        // revisao/merge). Resolve o id pelo nome da branch (dev/{pbi|bug|feature}-<id>).
+        // Nao mexe em itens ja em Done/Removed/Review.
+        private void MoveWorkItemToReview(string sourceBranch)
+        {
+            var id = WorkItemIdFromBranch(sourceBranch);
+
+            if (id <= 0)
+                return;
+
+            var workItem = workItemTrackingClient.GetWorkItemAsync(id, expand: WorkItemExpand.All).Result;
+            var type = workItem.GetField<string>("System.WorkItemType");
+
+            if (type != "Product Backlog Item" && type != "Bug")
+                return;
+
+            var state = workItem.GetField<string>("System.State");
+
+            if (state == "Done" || state == "Removed" || state == "Review")
+                return;
+
+            AzureWorkItemHelpers.ChangeState(workItemTrackingClient, id, "Review");
+        }
+
+        private static int WorkItemIdFromBranch(string branch)
+        {
+            var match = Regex.Match(branch ?? string.Empty, @"(?:^|/)(?:pbi|bug|feature|branch)-(\d+)", RegexOptions.IgnoreCase);
+
+            return match.Success ? int.Parse(match.Groups[1].Value) : 0;
         }
 
         private string BuildPrUrl(string projectName, string repoName, int pullRequestId)
