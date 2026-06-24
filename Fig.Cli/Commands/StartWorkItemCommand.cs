@@ -1,6 +1,7 @@
 ﻿using Fig.Cli.Extensions;
 using Fig.Cli.Helpers;
 using Fig.Cli.Options;
+using Fig.Cli.TeamFoundation.Helpers;
 using Microsoft.TeamFoundation.Core.WebApi;
 using Microsoft.TeamFoundation.SourceControl.WebApi;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
@@ -63,6 +64,7 @@ namespace Fig.Cli.Commands
 
             LinkWorkItems(project, repo, newBranch, branchName, relatedWorkitems);
             StartFirstTask(workitem, relatedWorkitems);
+            CommitBacklogItem(workitem, relatedWorkitems);
 
             if (Options.Worktree)
                 ConfigureWorktree(branchName);
@@ -179,6 +181,37 @@ namespace Fig.Cli.Commands
             };
 
             workItemTrackingClient.UpdateWorkItemAsync(patchDocument, (int)task.Id).Wait();
+        }
+
+        // Alem da Task em In Progress, move o item de backlog (PBI/Bug) para Committed
+        // ao iniciar — espelha o ciclo Scrum (New/Approved -> Committed). Nao rebaixa
+        // itens ja em Committed/Done/Removed.
+        private void CommitBacklogItem(WorkItem startedItem, List<WorkItem> relatedWorkitems)
+        {
+            var backlogItem = GetBacklogItem(startedItem, relatedWorkitems);
+
+            if (backlogItem == null)
+                return;
+
+            var state = backlogItem.GetField<string>("System.State");
+
+            if (state == "New" || state == "Approved")
+                AzureWorkItemHelpers.ChangeState(workItemTrackingClient, (int)backlogItem.Id, "Committed");
+        }
+
+        private static WorkItem GetBacklogItem(WorkItem startedItem, List<WorkItem> relatedWorkitems)
+        {
+            var type = startedItem.GetField<string>("System.WorkItemType");
+
+            if (type == "Product Backlog Item" || type == "Bug")
+                return startedItem;
+
+            // Iniciou uma Task: usa o PBI/Bug mais proximo dentre os relacionados.
+            return relatedWorkitems.FirstOrDefault(c =>
+            {
+                var t = c.GetField<string>("System.WorkItemType");
+                return t == "Product Backlog Item" || t == "Bug";
+            });
         }
 
         private WorkItem CreateDevelopmentTask(WorkItem parent)

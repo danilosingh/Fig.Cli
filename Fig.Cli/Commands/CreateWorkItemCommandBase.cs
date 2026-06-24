@@ -21,6 +21,11 @@ namespace Fig.Cli.Commands
         // Campo que recebe o corpo principal (Description para PBI, ReproSteps para Bug).
         protected abstract string BodyFieldRefName { get; }
 
+        // Hook para campos especificos do tipo (ex: Severity do Bug). Padrao: nada.
+        protected virtual void AddExtraFields(JsonPatchDocument patch)
+        {
+        }
+
         public override CommandResult Execute()
         {
             if (string.IsNullOrWhiteSpace(Options.Title))
@@ -62,6 +67,8 @@ namespace Fig.Cli.Commands
                     }
                 });
             }
+
+            AddExtraFields(patch);
 
             var created = client.CreateWorkItemAsync(patch, Context.Options.ProjectName, WorkItemType).Result;
             var url = $"{Context.Options.ProjectUrl}/_workitems/edit/{created.Id}";

@@ -16,5 +16,8 @@ namespace Fig.Cli.Options
 
         [Option("parent", HelpText = "Parent Feature id (optional)")]
         public int? Parent { get; set; }
+
+        [Option("severity", HelpText = "Severidade (Critica, Alta, Media, Baixa) — campo nativo do ADO. Opcional.")]
+        public string Severity { get; set; }
     }
 }
