@@ -14,7 +14,10 @@ namespace Fig.Cli.Options
         [Option("transition", HelpText = "Transition the issue to a status by name (e.g. \"Em andamento\")")]
         public string Transition { get; set; }
 
-        [Option("json", HelpText = "Output the issue as JSON (key/summary/description/type/status/url)")]
+        [Option("fields", HelpText = "Comma-separated extra field ids to include in the output (e.g. customfield_10303)")]
+        public string Fields { get; set; }
+
+        [Option("json", HelpText = "Output the issue as JSON (key/summary/description/type/status/url + extra fields)")]
         public bool Json { get; set; }
     }
 }
