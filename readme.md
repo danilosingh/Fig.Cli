@@ -101,6 +101,7 @@ Ponte com o Jira Cloud pra trazer demanda de suporte (ex: `SUS-629`, `SUP-…`) 
 | --- | --- |
 | `fig jira <KEY>` | Lê o issue (título, descrição, tipo, status) em texto |
 | `fig jira <KEY> --json` | Igual, em JSON (pra consumo por script/agente) |
+| `fig jira <KEY> --fields <id1>,<id2>` | Inclui campos extras (ex: `customfield_10303`) no output — o label vem do próprio Jira (`expand=names`); valor achatado (string/objeto/array) |
 | `fig jira <KEY> --comment "<texto>"` | Adiciona um comentário ao issue |
 | `fig jira <KEY> --transition "<status>"` | Move o issue para um status pelo nome (ex: `"Em andamento"`) |
 
