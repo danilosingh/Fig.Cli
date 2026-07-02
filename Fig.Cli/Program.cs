@@ -118,12 +118,18 @@ namespace Fig.Cli
                 .Select(c => $"{c.Message} on {c.StackTrace}"));
         }
 
-        private static void ConsoleWrite(string format, params object[] args)
+        private static void ConsoleWrite(string message, params object[] args)
         {
-            if (string.IsNullOrEmpty(format))
+            if (string.IsNullOrEmpty(message))
                 return;
 
-            Console.WriteLine(format, args);
+            // Nunca tratar `message` como composite format string quando não há args:
+            // conteúdo buscado (Jira/ADF, JSON, corpos com `{`) faria Console.WriteLine
+            // lançar FormatException. Só interpreta placeholders quando args foram passados.
+            if (args == null || args.Length == 0)
+                Console.WriteLine(message);
+            else
+                Console.WriteLine(message, args);
         }
     }
 }
