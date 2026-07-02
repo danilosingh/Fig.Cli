@@ -102,15 +102,20 @@ namespace Fig.Cli.Commands
                 $"AND [System.AssignedTo] = '{Context.Options.UserName}' " +
                 $"AND [System.State] = 'In Progress' ";
 
-            if (Options.WorkItemId > 0)
-                query += "AND [System.Id] = " + Options.WorkItemId.ToString();
-
             var queryResult = workItemTrackingClient.QueryByWiqlAsync(new Wiql() { Query = query }).Result;
 
-            if (!queryResult.WorkItems.Any())
-                throw new FigException("No items in progress");
-
             var workItems = queryResult.WorkItems.Select(c => workItemTrackingClient.GetWorkItemAsync(c.Id, expand: WorkItemExpand.All).Result).ToList();
+
+            // O id passado normalmente é o do PBI/Bug — que o `fig start` move para
+            // Committed enquanto põe a Task filha em In Progress. Por isso filtramos
+            // pelas Tasks In Progress cujo pai é esse id (ou pelo próprio item, caso
+            // ele mesmo seja uma Task In Progress). Filtrar por [System.Id] = id na
+            // WIQL nunca casaria com a Task filha.
+            if (Options.WorkItemId > 0)
+                workItems = workItems.Where(c => c.Id == Options.WorkItemId || c.GetParentId() == Options.WorkItemId).ToList();
+
+            if (!workItems.Any())
+                throw new FigException("No items in progress");
 
             if (WorkItemsFromDifferentParents(workItems))
                 throw new FigException("The workitems in progress are of different parents");
