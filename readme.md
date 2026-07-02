@@ -75,7 +75,8 @@ Principais chaves:
 
 | Comando | O que faz |
 | --- | --- |
-| `fig script` | Cria um novo script de migração (nome + header automáticos) |
+| `fig script` | Cria um novo script de migração (nome + header automáticos) e o abre no editor padrão |
+| `fig script --noopen` | Cria o script sem abrir o arquivo (útil pra automação/agente) |
 | `fig template` | Cria um novo template de script |
 | `fig migratedb` | Aplica as migrações pendentes no banco |
 | `fig runscripts` | Roda os scripts de uma pasta |

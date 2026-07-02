@@ -34,11 +34,16 @@ namespace Fig.Cli.Commands
             string fileName = Path.Combine(path, scriptName);
             WriteScript(fileName, GetTemplate());
 
-            using var process = new Process
+            // Por padrão abre o arquivo no editor padrão de .sql (ex: DBeaver).
+            // --noopen só cria o arquivo, sem abrir nada (útil pra automação/agente).
+            if (!Options.NoOpen)
             {
-                StartInfo = new ProcessStartInfo(fileName) { UseShellExecute = true }
-            };
-            process.Start();
+                using var process = new Process
+                {
+                    StartInfo = new ProcessStartInfo(fileName) { UseShellExecute = true }
+                };
+                process.Start();
+            }
 
             return Ok("Script {0} created.", fileName);
         }
