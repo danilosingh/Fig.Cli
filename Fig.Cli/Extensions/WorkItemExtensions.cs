@@ -17,7 +17,7 @@ namespace Fig.Cli.Extensions
 
         public static int GetParentId(this WorkItem workItem)
         {
-            var parentRelation = workItem.Relations.FirstOrDefault(c => c.Rel == "System.LinkTypes.Hierarchy-Reverse");
+            var parentRelation = workItem.Relations?.FirstOrDefault(c => c.Rel == "System.LinkTypes.Hierarchy-Reverse");
 
             if (parentRelation == null)
                 return 0;
