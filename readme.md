@@ -65,7 +65,7 @@ Principais chaves:
 | `fig merge` | Faz merge de outra branch |
 | `fig rebase` | Rebase a partir de outra branch |
 | `fig release` | Configura a versão de release |
-| `fig pr [<título>] [-t <target>] [-d <desc>] [--draft]` | **Cria** o PR via API (headless) da branch atual → target (default: branch padrão do repo); idempotente — retorna o PR ativo se já existir |
+| `fig pr [<título>] [-t <target>] [-d <desc>] [--draft]` | **Cria** o PR via API (headless) da branch atual → target (default: branch padrão do repo); idempotente — retorna o PR ativo se já existir. **Vincula o work item ao PR** (link work item→PR pelo id da branch `dev/{pbi\|bug\|feature}-<id>`), pois o ADO não copia o link da branch pro PR |
 | `fig pullr` | Abre a **página** de criação de Pull Request no navegador (branch atual → master) |
 | `fig mergepull` | Faz merge das mudanças do PR de destino em outra branch |
 | `fig cleardevbranches` | Remove branches de desenvolvimento locais e remotas |
@@ -89,7 +89,7 @@ Principais chaves:
 | `fig bug <título> [--desc-file <md>] [--ac-file <md>] [--parent <id>]` | Cria um Bug (sem `--desc-file` = captura só com título, nasce em New) |
 | `fig feature <título> --desc-file <md> [--ac-file <md>] [--parent <id>]` | Cria uma Feature |
 | `fig task <parent-id> <título> [--desc-file <md>]` | Cria uma Task sob um work item pai |
-| `fig edit <id> [--title <t>] [--desc-file <md>] [--ac-file <md>]` | Edita um work item existente; atualização parcial |
+| `fig edit <id> [--title <t>] [--desc-file <md>] [--ac-file <md>] [--field RefName=Value]` | Edita um work item existente; atualização parcial. `--field` (repetível, também em `fig done`) seta qualquer campo pelo ref name — ex.: `--field Custom.Changelog="…"`; multilinha vira `<br>` |
 | `fig show <id>` | Mostra um work item (título, corpo, critérios) em texto |
 | `fig comment <id> "<texto>"` (ou `--file <md>`) | Adiciona um comentário ao work item |
 | `fig list [--mine] [--state <s>] [--type <t>] [--top <n>]` | Lista work items (`--mine` = atribuídos a você) |
