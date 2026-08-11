@@ -16,5 +16,8 @@ namespace Fig.Cli.Options
 
         [Option("ac-file", HelpText = "Markdown file with the Acceptance Criteria")]
         public string AcFile { get; set; }
+
+        [Option('f', "field", HelpText = "Set any field: --field RefName=Value (repetível). Ex.: --field Custom.Changelog=\"tipo: added ...\"")]
+        public System.Collections.Generic.IEnumerable<string> Fields { get; set; }
     }
 }

@@ -46,8 +46,20 @@ namespace Fig.Cli.Commands
                 patch.Add(WorkItemContent.Field("Microsoft.VSTS.Common.AcceptanceCriteria", WorkItemContent.ToHtml(Options.AcFile)));
             }
 
+            if (Options.Fields != null)
+            {
+                foreach (var pair in Options.Fields)
+                {
+                    var idx = pair.IndexOf('=');
+                    if (idx <= 0)
+                        throw new FigException($"Invalid --field '{pair}'. Use RefName=Value.");
+
+                    patch.Add(WorkItemContent.Field(pair.Substring(0, idx).Trim(), WorkItemContent.FieldValue(pair.Substring(idx + 1))));
+                }
+            }
+
             if (patch.Count == 0)
-                throw new FigException("Nothing to update. Pass --title, --desc-file or --ac-file.");
+                throw new FigException("Nothing to update. Pass --title, --desc-file, --ac-file or --field.");
 
             var updated = client.UpdateWorkItemAsync(patch, Options.Id).Result;
             var url = $"{Context.Options.ProjectUrl}/_workitems/edit/{updated.Id}";

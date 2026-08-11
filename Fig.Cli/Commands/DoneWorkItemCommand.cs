@@ -28,6 +28,7 @@ namespace Fig.Cli.Commands
 
             AddStep(Options.Commit, () => Commit());
             AddStep(() => ChangeWorkItemsState(workItems));
+            AddStep(Options.Fields != null && Options.Fields.Any(), () => SetFields(workItems));
             AddStep(!Options.NoSync, () => Sync());
             AddStep(!Options.NoPullRequest, () => OpenPullRequest(workItems));
 
@@ -68,6 +69,23 @@ namespace Fig.Cli.Commands
         private CommandResult Sync()
         {
             return CommandFactory.Execute<SyncCommand>(new SyncOptions());
+        }
+
+        private CommandResult SetFields(IList<WorkItem> workItems)
+        {
+            // Campos custom vivem no backlog item (PBI/Bug), não na Task.
+            var backlogId = Options.WorkItemId > 0 ? Options.WorkItemId : workItems.First().GetParentId();
+
+            foreach (var pair in Options.Fields)
+            {
+                var idx = pair.IndexOf('=');
+                if (idx <= 0)
+                    throw new FigException($"Invalid --field '{pair}'. Use RefName=Value.");
+
+                AzureWorkItemHelpers.ChangeField(workItemTrackingClient, backlogId, pair.Substring(0, idx).Trim(), WorkItemContent.FieldValue(pair.Substring(idx + 1)));
+            }
+
+            return Ok("Fields set on #{0}", backlogId);
         }
 
         private CommandResult ChangeWorkItemsState(IList<WorkItem> workItems)
