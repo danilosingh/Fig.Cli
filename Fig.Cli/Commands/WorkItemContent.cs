@@ -35,6 +35,17 @@ namespace Fig.Cli.Commands
             };
         }
 
+        // Prepara o valor para campos HTML/multiline: se tiver quebra de linha, escapa e converte
+        // \n em <br> (assim renderiza no ADO). Valor de uma linha só passa raw (não estraga campos string).
+        public static string FieldValue(string raw)
+        {
+            if (raw == null || !raw.Contains('\n'))
+                return raw;
+
+            var esc = raw.Replace("&", "&amp;").Replace("<", "&lt;").Replace(">", "&gt;");
+            return esc.Replace("\r\n", "\n").Replace("\n", "<br>");
+        }
+
         // Conversão simples de HTML (como vem do ADO) para texto legível, para o `show`.
         public static string HtmlToText(string html)
         {

@@ -20,6 +20,9 @@ namespace Fig.Cli.Options
         [Option('y', "yes", HelpText = "Skip confirmations (non-interactive)")]
         public bool Yes { get; set; }
 
+        [Option('f', "field", HelpText = "Set any field on the backlog item: --field RefName=Value (repetível). Ex.: --field Custom.Changelog=\"tipo: added ...\"")]
+        public System.Collections.Generic.IEnumerable<string> Fields { get; set; }
+
         public bool Commit { get { return !string.IsNullOrEmpty(CommitMessage); } }
     }
 }

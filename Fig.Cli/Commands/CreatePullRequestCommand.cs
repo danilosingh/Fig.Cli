@@ -5,6 +5,9 @@ using Fig.Cli.TeamFoundation.Helpers;
 using Microsoft.TeamFoundation.SourceControl.WebApi;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
+using Microsoft.VisualStudio.Services.WebApi.Patch;
+using Microsoft.VisualStudio.Services.WebApi.Patch.Json;
+using System;
 using System.Linq;
 using System.Text.RegularExpressions;
 
@@ -41,7 +44,10 @@ namespace Fig.Cli.Commands
             }).Result.FirstOrDefault();
 
             if (existing != null)
+            {
+                LinkWorkItemToPullRequest(source, project.Id, repo.Id, existing.PullRequestId);
                 return Ok("PR #{0} ja existe: {1}", existing.PullRequestId, BuildPrUrl(project.Name, repo.Name, existing.PullRequestId));
+            }
 
             var title = Options.Title;
 
@@ -60,9 +66,39 @@ namespace Fig.Cli.Commands
                 IsDraft = Options.Draft
             }, repo.Id).Result;
 
+            LinkWorkItemToPullRequest(source, project.Id, repo.Id, created.PullRequestId);
             MoveWorkItemToReview(source);
 
             return Ok("PR #{0} criado: {1}", created.PullRequestId, BuildPrUrl(project.Name, repo.Name, created.PullRequestId));
+        }
+
+        // Vincula o work item (id no nome da branch: dev/{pbi|bug|feature}-<id>) ao PR, para que a
+        // automação de changelog e o rastreio de commits->work item funcionem. O ADO NÃO copia o link
+        // do branch para o PR automaticamente, por isso fazemos explicitamente aqui.
+        private void LinkWorkItemToPullRequest(string sourceBranch, Guid projectId, Guid repoId, int pullRequestId)
+        {
+            var id = WorkItemIdFromBranch(sourceBranch);
+
+            if (id <= 0)
+                return;
+
+            var patch = new JsonPatchDocument
+            {
+                new JsonPatchOperation
+                {
+                    Operation = Operation.Add,
+                    Path = "/relations/-",
+                    Value = new
+                    {
+                        rel = "ArtifactLink",
+                        url = $"vstfs:///Git/PullRequestId/{projectId}%2F{repoId}%2F{pullRequestId}",
+                        attributes = new { name = "Pull Request" }
+                    }
+                }
+            };
+
+            // Não falha o PR se já estiver vinculado (relação duplicada) ou sem permissão.
+            try { workItemTrackingClient.UpdateWorkItemAsync(patch, id).Wait(); } catch { }
         }
 
         // Ao abrir o PR, o item de backlog sai de Committed e entra em Review (aguardando
