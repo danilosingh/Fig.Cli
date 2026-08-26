@@ -219,6 +219,11 @@ dotnet publish Fig.Cli/Fig.Cli.csproj -c Release -r win-x64 `
 No **Windows**, a distribuição oficial é via instalador MSI em `Fig.Cli.Setup` (WiX) — abra a
 solução e gere o pacote, ou rode o `fig.exe` publicado direto.
 
+> **Mandando o `fig.exe` solto pra alguém, mande o `sni.dll` junto.** O publish do Windows gera os
+> dois: o `sni.dll` é nativo e **não** entra no single-file. Sem ele na mesma pasta parece tudo
+> certo, até alguém usar um comando de banco em SQL Server e falhar ao carregar a DLL. macOS e
+> Linux não geram esse arquivo.
+
 ---
 
 ## Desenvolvimento
