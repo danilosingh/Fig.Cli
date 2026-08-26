@@ -55,8 +55,32 @@ namespace Fig.Cli.Commands
                 sb.AppendLine(ac);
             }
 
+            var links = wi.Relations?.Where(r => r.Rel == "Hyperlink").ToList();
+
+            if (links != null && links.Any())
+            {
+                sb.AppendLine();
+                sb.AppendLine("## Links");
+
+                foreach (var link in links)
+                {
+                    var comment = LinkComment(link);
+                    sb.AppendLine(string.IsNullOrWhiteSpace(comment) ? $"- {link.Url}" : $"- {comment}: {link.Url}");
+                }
+            }
+
             WriteLine(sb.ToString());
             return Ok(null);
+        }
+
+        private static string LinkComment(WorkItemRelation link)
+        {
+            if (link.Attributes != null && link.Attributes.TryGetValue("comment", out var comment))
+            {
+                return comment?.ToString();
+            }
+
+            return null;
         }
     }
 }

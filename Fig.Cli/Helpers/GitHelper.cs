@@ -170,6 +170,21 @@ namespace Fig.Cli.Helpers
             }
         }
 
+        public static bool IsTracked(string path, string workingDirectory)
+        {
+            try
+            {
+                var result = CmdHelper.ExecuteCommand(
+                    $"git ls-files --error-unmatch \"{path}\"", workingDirectory, false, false, false);
+
+                return result.IsSuccess;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
         public static bool Commit(string commitMessage, bool checkHasChangesBeforeCommit = false, bool showCommand = true)
         {
             if (checkHasChangesBeforeCommit && !HasChanges(showCommand))

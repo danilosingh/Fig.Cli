@@ -90,9 +90,31 @@ Principais chaves:
 | `fig feature <título> --desc-file <md> [--ac-file <md>] [--parent <id>]` | Cria uma Feature |
 | `fig task <parent-id> <título> [--desc-file <md>]` | Cria uma Task sob um work item pai |
 | `fig edit <id> [--title <t>] [--desc-file <md>] [--ac-file <md>] [--field RefName=Value]` | Edita um work item existente; atualização parcial. `--field` (repetível, também em `fig done`) seta qualquer campo pelo ref name — ex.: `--field Custom.Changelog="…"`; multilinha vira `<br>` |
-| `fig show <id>` | Mostra um work item (título, corpo, critérios) em texto |
+| `fig show <id>` | Mostra um work item (título, corpo, critérios, links) em texto |
 | `fig comment <id> "<texto>"` (ou `--file <md>`) | Adiciona um comentário ao work item |
+| `fig link <id> <caminho\|url> [--title <t>] [--branch <ref>]` | Adiciona um hyperlink ao work item (aba **Links** do ADO) |
 | `fig list [--mine] [--state <s>] [--type <t>] [--top <n>]` | Lista work items (`--mine` = atribuídos a você) |
+
+#### Links (`fig link`)
+
+Referência de work item — spec técnica, runbook, dashboard — vai na **aba Links do ADO**, que é o
+campo nativo pra isso, e não no corpo da descrição.
+
+```bash
+fig link 5093 docs/specs/app/5093-danfse-xml-first.md --title "Spec técnica (PDF)"
+fig link 5093 https://grafana.net/d/abc/painel --title "Painel de erros"
+```
+
+- **Caminho do repositório ou URL absoluta.** Começando com `http(s)://`, é usado como está;
+  qualquer outra coisa é caminho no repo, e a URL é montada a partir de `ProjectUrl`, `ProjectName`
+  e `RepositoryName` do `.fig/.conf` — é o que permite escrever o caminho em vez de montar
+  `.../_git/Repo?path=…` na mão.
+- **`--title`** vira o rótulo na aba Links; sem ele, um caminho usa o nome do arquivo.
+- **Idempotente:** rodar de novo com a mesma URL não duplica o link.
+- **Não fixa a branch.** A URL segue a branch default do repositório, então o link sobrevive ao
+  merge e à exclusão da branch de trabalho. `--branch <ref>` fixa, quando for mesmo o caso.
+- **Caminho inexistente é erro**; caminho ainda **não versionado é aviso** — o link só abre depois
+  que o arquivo chegar na branch default. É o caso normal de criar a spec e linkar em seguida.
 
 ### Jira (Suporte / Sustentação)
 
