@@ -6,6 +6,7 @@ using Microsoft.TeamFoundation.Core.WebApi;
 using Microsoft.TeamFoundation.SourceControl.WebApi;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
+using Microsoft.VisualStudio.Services.WebApi;
 using Microsoft.VisualStudio.Services.WebApi.Patch;
 using Microsoft.VisualStudio.Services.WebApi.Patch.Json;
 using System;
@@ -65,6 +66,7 @@ namespace Fig.Cli.Commands
             LinkWorkItems(project, repo, newBranch, branchName, relatedWorkitems);
             StartFirstTask(workitem, relatedWorkitems);
             CommitBacklogItem(workitem, relatedWorkitems);
+            AssignBacklogItem(workitem, relatedWorkitems);
 
             if (Options.Worktree)
                 ConfigureWorktree(branchName);
@@ -197,6 +199,29 @@ namespace Fig.Cli.Commands
 
             if (state == "New" || state == "Approved")
                 AzureWorkItemHelpers.ChangeState(workItemTrackingClient, (int)backlogItem.Id, "Committed");
+        }
+
+        // Quem inicia e quem desenvolve: atribui o item de backlog (PBI/Bug) ao dev, mas so
+        // se ele estiver sem responsavel — nunca toma o item de outra pessoa, apenas avisa.
+        private void AssignBacklogItem(WorkItem startedItem, List<WorkItem> relatedWorkitems)
+        {
+            var backlogItem = GetBacklogItem(startedItem, relatedWorkitems);
+
+            if (backlogItem == null || string.IsNullOrWhiteSpace(Context.Options.UserName))
+                return;
+
+            if (backlogItem.Fields.TryGetValue("System.AssignedTo", out var assigned) && assigned != null)
+            {
+                var identity = assigned as IdentityRef;
+                var assignedName = identity?.UniqueName ?? assigned.ToString();
+
+                if (!string.Equals(assignedName, Context.Options.UserName, StringComparison.OrdinalIgnoreCase))
+                    WriteLine("Aviso: #{0} ja esta atribuido a {1}; responsavel mantido.", backlogItem.Id, identity?.DisplayName ?? assignedName);
+
+                return;
+            }
+
+            AzureWorkItemHelpers.ChangeField(workItemTrackingClient, (int)backlogItem.Id, "System.AssignedTo", Context.Options.UserName);
         }
 
         private static WorkItem GetBacklogItem(WorkItem startedItem, List<WorkItem> relatedWorkitems)

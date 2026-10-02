@@ -54,6 +54,12 @@ namespace Fig.Cli.Commands
             if (!string.IsNullOrWhiteSpace(Options.ExternalRef))
                 patch.Add(WorkItemContent.Field("System.Tags", Options.ExternalRef));
 
+            // Responsavel so quando pedido: o item pode ser criado pra outra pessoa desenvolver.
+            var assignee = ResolveAssignee();
+
+            if (assignee != null)
+                patch.Add(WorkItemContent.Field("System.AssignedTo", assignee));
+
             // Corpo e opcional: sem --desc-file e uma captura so-titulo (item nasce
             // em New pra triagem depois). Se um caminho foi informado, ele tem que existir.
             if (!string.IsNullOrEmpty(Options.DescFile))
@@ -88,16 +94,60 @@ namespace Fig.Cli.Commands
 
             AddExtraFields(patch);
 
+            // Sem BacklogPriority o ADO poe o item no fim do backlog (e da coluna New);
+            // uma prioridade abaixo da menor existente coloca a demanda nova no topo.
+            var topPriority = TopOfBacklogPriority();
+
+            if (topPriority.HasValue)
+                patch.Add(WorkItemContent.Field("Microsoft.VSTS.Common.BacklogPriority", topPriority.Value));
+
             var created = client.CreateWorkItemAsync(patch, Context.Options.ProjectName, WorkItemType).Result;
             var url = $"{Context.Options.ProjectUrl}/_workitems/edit/{created.Id}";
 
             return Ok("{0} #{1} criado: {2}", WorkItemType, created.Id, url);
         }
 
+        private string ResolveAssignee()
+        {
+            if (string.IsNullOrWhiteSpace(Options.Assign))
+                return null;
+
+            if (!string.Equals(Options.Assign.Trim(), "me", System.StringComparison.OrdinalIgnoreCase))
+                return Options.Assign.Trim();
+
+            if (string.IsNullOrWhiteSpace(Context.Options.UserName))
+                throw new FigException("--assign me requer o UserName no .fig/.conf.");
+
+            return Context.Options.UserName;
+        }
+
+        private double? TopOfBacklogPriority()
+        {
+            // PBI e Bug dividem o mesmo backlog; Feature tem o seu.
+            var types = WorkItemType == "Feature" ? "'Feature'" : "'Product Backlog Item', 'Bug'";
+            var query = $"SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = '{Context.Options.ProjectName}' " +
+                $"AND [System.WorkItemType] IN ({types}) AND [Microsoft.VSTS.Common.BacklogPriority] > 0 " +
+                "ORDER BY [Microsoft.VSTS.Common.BacklogPriority] ASC";
+            var result = client.QueryByWiqlAsync(new Wiql { Query = query }, top: 1).Result;
+
+            if (result.WorkItems == null || !result.WorkItems.Any())
+                return null;
+
+            var top = client.GetWorkItemAsync(result.WorkItems.First().Id, new[] { "Microsoft.VSTS.Common.BacklogPriority" }).Result;
+
+            if (!top.Fields.TryGetValue("Microsoft.VSTS.Common.BacklogPriority", out var value) || value == null)
+                return null;
+
+            var min = System.Convert.ToDouble(value, System.Globalization.CultureInfo.InvariantCulture);
+
+            return min > 1 ? min - 1 : min / 2;
+        }
+
         private WorkItem FindByRef(string externalRef)
         {
             var safe = externalRef.Replace("'", "''");
-            var query = $"SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = '{Context.Options.ProjectName}' AND [System.Tags] CONTAINS '{safe}'";
+            // Item Removed nao conta: a referencia pode ser registrada de novo.
+            var query = $"SELECT [System.Id] FROM WorkItems WHERE [System.TeamProject] = '{Context.Options.ProjectName}' AND [System.Tags] CONTAINS '{safe}' AND [System.State] <> 'Removed'";
             var result = client.QueryByWiqlAsync(new Wiql { Query = query }).Result;
 
             if (result.WorkItems == null || !result.WorkItems.Any())

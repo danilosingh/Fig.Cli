@@ -20,6 +20,9 @@ namespace Fig.Cli.Options
         [Option("ref", HelpText = "Referencia externa (ex: ticket de suporte SUS-629) — gravada como tag; torna a criacao idempotente (nao duplica)")]
         public string ExternalRef { get; set; }
 
+        [Option("assign", HelpText = "Responsavel (opcional): 'me' (UserName do .fig/.conf) ou o e-mail de outra pessoa. Sem ele, o item nasce sem responsavel")]
+        public string Assign { get; set; }
+
         [Option("severity", HelpText = "Severidade (Critica, Alta, Media, Baixa) — campo nativo do ADO. Opcional.")]
         public string Severity { get; set; }
     }
