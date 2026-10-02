@@ -1,6 +1,7 @@
 using Fig.Cli.Options;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi;
 using Microsoft.TeamFoundation.WorkItemTracking.WebApi.Models;
+using Microsoft.VisualStudio.Services.WebApi;
 using System.Linq;
 using System.Text;
 
@@ -38,10 +39,21 @@ namespace Fig.Cli.Commands
                 parentId = parent.Url.Substring(parent.Url.LastIndexOf('/') + 1);
 
             var tags = Field("System.Tags");
+            var assignedTo = wi.Fields.TryGetValue("System.AssignedTo", out var a) && a is IdentityRef identity
+                ? $"{identity.DisplayName} <{identity.UniqueName}>"
+                : "-";
+            var severity = Field("Microsoft.VSTS.Common.Severity");
+            var iteration = Field("System.IterationPath");
 
             var sb = new StringBuilder();
             sb.AppendLine($"# {Field("System.Title")}");
             sb.AppendLine($"Id: {wi.Id} | Tipo: {type} | Estado: {Field("System.State")} | Parent: {parentId}");
+            sb.AppendLine($"Responsável: {assignedTo}");
+            if (!string.IsNullOrWhiteSpace(severity))
+                sb.AppendLine($"Severidade: {severity}");
+            // Sem sprint, o IterationPath e so a raiz (nome do projeto, sem '\').
+            if (!string.IsNullOrWhiteSpace(iteration) && iteration.Contains('\\'))
+                sb.AppendLine($"Sprint: {iteration}");
             if (!string.IsNullOrWhiteSpace(tags))
                 sb.AppendLine($"Tags: {tags}");
             sb.AppendLine();

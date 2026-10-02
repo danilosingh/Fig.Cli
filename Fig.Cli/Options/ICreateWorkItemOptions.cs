@@ -7,5 +7,6 @@ namespace Fig.Cli.Options
         string AcFile { get; }
         int? Parent { get; }
         string ExternalRef { get; }
+        string Assign { get; }
     }
 }

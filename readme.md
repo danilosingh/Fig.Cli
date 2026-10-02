@@ -59,7 +59,7 @@ Principais chaves:
 | Comando | O que faz |
 | --- | --- |
 | `fig init` | Inicializa o Fig.Cli no repositório |
-| `fig start <id>` | Cria a branch da feature a partir de um work item |
+| `fig start <id>` | Cria a branch da feature a partir de um work item; atribui o PBI/Bug a você se estiver sem responsável |
 | `fig done` | Finaliza o trabalho em progresso, sincroniza e abre o PR |
 | `fig sync` | Sincroniza a branch atual com o remoto |
 | `fig merge` | Faz merge de outra branch |
@@ -85,12 +85,12 @@ Principais chaves:
 
 | Comando | O que faz |
 | --- | --- |
-| `fig pbi <título> [--desc-file <md>] [--ac-file <md>] [--parent <id>]` | Cria um Product Backlog Item (sem `--desc-file` = captura só com título, nasce em New) |
-| `fig bug <título> [--desc-file <md>] [--ac-file <md>] [--parent <id>]` | Cria um Bug (sem `--desc-file` = captura só com título, nasce em New) |
-| `fig feature <título> --desc-file <md> [--ac-file <md>] [--parent <id>]` | Cria uma Feature |
+| `fig pbi <título> [--desc-file <md>] [--ac-file <md>] [--parent <id>] [--assign me\|<email>]` | Cria um Product Backlog Item (sem `--desc-file` = captura só com título, nasce em New) |
+| `fig bug <título> [--desc-file <md>] [--ac-file <md>] [--parent <id>] [--assign me\|<email>]` | Cria um Bug (sem `--desc-file` = captura só com título, nasce em New) |
+| `fig feature <título> --desc-file <md> [--ac-file <md>] [--parent <id>] [--assign me\|<email>]` | Cria uma Feature |
 | `fig task <parent-id> <título> [--desc-file <md>]` | Cria uma Task sob um work item pai |
 | `fig edit <id> [--title <t>] [--desc-file <md>] [--ac-file <md>] [--field RefName=Value]` | Edita um work item existente; atualização parcial. `--field` (repetível, também em `fig done`) seta qualquer campo pelo ref name — ex.: `--field Custom.Changelog="…"`; multilinha vira `<br>` |
-| `fig show <id>` | Mostra um work item (título, corpo, critérios, links) em texto |
+| `fig show <id>` | Mostra um work item (título, estado, responsável, severidade, sprint, corpo, critérios, links) em texto |
 | `fig comment <id> "<texto>"` (ou `--file <md>`) | Adiciona um comentário ao work item |
 | `fig link <id> <caminho\|url> [--title <t>] [--branch <ref>]` | Adiciona um hyperlink ao work item (aba **Links** do ADO) |
 | `fig list [--mine] [--state <s>] [--type <t>] [--top <n>]` | Lista work items (`--mine` = atribuídos a você) |
@@ -151,6 +151,14 @@ campos nativos:
 | --- | --- | --- |
 | `pbi` | `System.Description` | `Microsoft.VSTS.Common.AcceptanceCriteria` |
 | `bug` | `Microsoft.VSTS.TCM.ReproSteps` | `Microsoft.VSTS.Common.AcceptanceCriteria` |
+
+**Responsável:** o item nasce **sem responsável** — muitas vezes é criado pra outra pessoa
+desenvolver. Use `--assign me` (o `UserName` do `.fig/.conf`) ou `--assign <email>` pra atribuir
+na criação. Sem isso, quem rodar o `fig start` vira o responsável (só se o item ainda estiver sem
+ninguém; se já tiver, o `fig start` mantém e avisa).
+
+**Posição no backlog:** o item nasce **no topo** do backlog (e da coluna New do board) — o `fig`
+grava `BacklogPriority` abaixo da menor existente. PBI e Bug dividem o mesmo backlog; Feature tem o seu.
 
 Exemplo:
 
